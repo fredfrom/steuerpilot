@@ -12,7 +12,7 @@ export async function connectDB(): Promise<void> {
 
   try {
     await mongoose.connect(uri);
-    console.log("Connected to MongoDB Atlas");
+    console.error("Connected to MongoDB Atlas");
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "Unknown error";

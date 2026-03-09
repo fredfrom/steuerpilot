@@ -18,6 +18,7 @@ export const typeDefs = gql`
     steuerart: String!
     bmfUrl: String!
     relevanceScore: Float!
+    tldr: String
   }
 
   type IndexStats {

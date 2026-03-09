@@ -39,6 +39,7 @@ export async function searchChunks(
       $project: {
         _id: 0,
         text: 1,
+        tldr: 1,
         metadata: 1,
         score: { $meta: "vectorSearchScore" },
       },

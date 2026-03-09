@@ -1,7 +1,9 @@
+import { GraphQLError } from "graphql";
 import { embedText } from "../services/embedding.js";
 import { searchChunks } from "../services/vectorSearch.js";
 import { generateAnswer } from "../services/llm.js";
 import { BmfChunk } from "../models/BmfChunk.js";
+import { EmbeddingError, VectorSearchError, LlmError } from "../errors/index.js";
 import type {
   SearchResult,
   IndexStats,
@@ -11,6 +13,8 @@ import type { LlmContextChunk } from "../types/llm.types.js";
 import type { VectorSearchResult } from "../types/search.types.js";
 
 const MAX_UNIQUE_SOURCES = 5;
+const MIN_QUESTION_LENGTH = 3;
+const MAX_QUESTION_LENGTH = 500;
 
 interface SearchArgs {
   question: string;
@@ -45,34 +49,76 @@ export const resolvers = {
       _parent: unknown,
       { question, steuerart }: SearchArgs
     ): Promise<SearchResult> => {
-      const queryEmbedding = await embedText(question);
+      // Input validation
+      if (
+        question.length < MIN_QUESTION_LENGTH ||
+        question.length > MAX_QUESTION_LENGTH
+      ) {
+        throw new GraphQLError(
+          "Die Frage muss zwischen 3 und 500 Zeichen lang sein.",
+          { extensions: { code: "BAD_USER_INPUT" } }
+        );
+      }
 
-      const chunks = await searchChunks(queryEmbedding, { steuerart });
-      const uniqueChunks = deduplicateBySource(chunks);
+      try {
+        const queryEmbedding = await embedText(question);
 
-      const llmChunks: LlmContextChunk[] = uniqueChunks.map((chunk) => ({
-        text: chunk.text,
-        metadata: {
+        const chunks = await searchChunks(queryEmbedding, { steuerart });
+        const uniqueChunks = deduplicateBySource(chunks);
+
+        const llmChunks: LlmContextChunk[] = uniqueChunks.map((chunk) => ({
+          text: chunk.text,
+          metadata: {
+            date: chunk.metadata.date,
+            gz: chunk.metadata.gz,
+            steuerart: chunk.metadata.steuerart,
+            title: chunk.metadata.title,
+            bmf_url: chunk.metadata.bmf_url,
+          },
+        }));
+
+        const answer = await generateAnswer(question, llmChunks);
+
+        const sources: Source[] = uniqueChunks.map((chunk) => ({
+          title: chunk.metadata.title,
           date: chunk.metadata.date,
           gz: chunk.metadata.gz,
           steuerart: chunk.metadata.steuerart,
-          title: chunk.metadata.title,
-          bmf_url: chunk.metadata.bmf_url,
-        },
-      }));
+          bmfUrl: chunk.metadata.bmf_url,
+          relevanceScore: chunk.score,
+          tldr: chunk.tldr ?? null,
+        }));
 
-      const answer = await generateAnswer(question, llmChunks);
-
-      const sources: Source[] = uniqueChunks.map((chunk) => ({
-        title: chunk.metadata.title,
-        date: chunk.metadata.date,
-        gz: chunk.metadata.gz,
-        steuerart: chunk.metadata.steuerart,
-        bmfUrl: chunk.metadata.bmf_url,
-        relevanceScore: chunk.score,
-      }));
-
-      return { answer, sources };
+        return { answer, sources };
+      } catch (error: unknown) {
+        if (error instanceof EmbeddingError) {
+          console.error(`Embedding failed: ${error.message}`);
+          throw new GraphQLError(
+            "Die Suche konnte nicht durchgeführt werden. Bitte versuchen Sie es später erneut.",
+            { extensions: { code: "INTERNAL_SERVER_ERROR" } }
+          );
+        }
+        if (error instanceof VectorSearchError) {
+          console.error(`Vector search failed: ${error.message}`);
+          throw new GraphQLError(
+            "Die Datenbanksuche ist fehlgeschlagen. Bitte versuchen Sie es später erneut.",
+            { extensions: { code: "INTERNAL_SERVER_ERROR" } }
+          );
+        }
+        if (error instanceof LlmError) {
+          console.error(`LLM generation failed: ${error.message}`);
+          throw new GraphQLError(
+            "Die Antwort konnte nicht generiert werden. Bitte versuchen Sie es später erneut.",
+            { extensions: { code: "INTERNAL_SERVER_ERROR" } }
+          );
+        }
+        // Unexpected errors — log full details, return generic message
+        console.error("Unexpected search error:", error);
+        throw new GraphQLError(
+          "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+          { extensions: { code: "INTERNAL_SERVER_ERROR" } }
+        );
+      }
     },
 
     stats: async (): Promise<IndexStats> => {

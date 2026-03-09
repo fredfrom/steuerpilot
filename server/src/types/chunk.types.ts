@@ -15,6 +15,7 @@ export interface IBmfChunk {
   chunk_index: number;
   text: string;
   embedding: number[];
+  tldr: string | null;
   metadata: BmfChunkMetadata;
 }
 

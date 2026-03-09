@@ -32,6 +32,7 @@ const MOCK_EMBEDDING = new Array(1024).fill(0.1) as number[];
 const MOCK_CHUNKS = [
   {
     text: "Die Homeoffice-Pauschale beträgt 6 Euro pro Tag.",
+    tldr: "Homeoffice-Pauschale: 6 Euro pro Tag absetzbar.",
     metadata: {
       date: "2023-01-01",
       gz: "IV C 6 - S 2145/19/10006 :013",
@@ -94,6 +95,7 @@ describe("GraphQL resolvers", () => {
                   steuerart
                   bmfUrl
                   relevanceScore
+                  tldr
                 }
               }
             }
@@ -118,6 +120,7 @@ describe("GraphQL resolvers", () => {
         "https://www.bundesfinanzministerium.de/bmf1"
       );
       expect(source.relevanceScore).toBe(0.95);
+      expect(source.tldr).toBe("Homeoffice-Pauschale: 6 Euro pro Tag absetzbar.");
 
       // Verify wiring: embedText called with the question
       expect(mockedEmbedText).toHaveBeenCalledWith("Homeoffice-Pauschale");
@@ -178,6 +181,7 @@ describe("GraphQL resolvers", () => {
       const duplicateChunks = [
         {
           text: "Chunk 1 from document A.",
+          tldr: null,
           metadata: {
             date: "2023-01-01",
             gz: "IV C 6",
@@ -191,6 +195,7 @@ describe("GraphQL resolvers", () => {
         },
         {
           text: "Chunk 2 from document A (higher score).",
+          tldr: "Zusammenfassung A.",
           metadata: {
             date: "2023-01-01",
             gz: "IV C 6",
@@ -204,6 +209,7 @@ describe("GraphQL resolvers", () => {
         },
         {
           text: "Chunk from document B.",
+          tldr: "Zusammenfassung B.",
           metadata: {
             date: "2023-06-15",
             gz: "IV C 7",
@@ -282,6 +288,7 @@ describe("GraphQL resolvers", () => {
       const chunksWithEmptyUrl = [
         {
           text: "Chunk 1 from unknown-URL document.",
+          tldr: null,
           metadata: {
             date: "2024-01-01",
             gz: "IV C 8",
@@ -295,6 +302,7 @@ describe("GraphQL resolvers", () => {
         },
         {
           text: "Chunk 2 from unknown-URL document (higher score).",
+          tldr: null,
           metadata: {
             date: "2024-01-01",
             gz: "IV C 8",
@@ -308,6 +316,7 @@ describe("GraphQL resolvers", () => {
         },
         {
           text: "Chunk from a document with a URL.",
+          tldr: "Zusammenfassung C.",
           metadata: {
             date: "2024-02-01",
             gz: "IV C 9",
@@ -392,6 +401,55 @@ describe("GraphQL resolvers", () => {
       expect(mockedEmbedText).not.toHaveBeenCalled();
       expect(mockedSearchChunks).not.toHaveBeenCalled();
       expect(mockedGenerateAnswer).not.toHaveBeenCalled();
+    });
+
+    it("rejects questions shorter than 3 characters", async () => {
+      const response = await request(app)
+        .post("/graphql")
+        .send({
+          query: `
+            query Search($question: String!) {
+              search(question: $question) {
+                answer
+              }
+            }
+          `,
+          variables: { question: "ab" },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors[0].message).toContain(
+        "zwischen 3 und 500 Zeichen"
+      );
+      expect(response.body.errors[0].extensions.code).toBe("BAD_USER_INPUT");
+
+      // No services should have been called
+      expect(mockedEmbedText).not.toHaveBeenCalled();
+    });
+
+    it("rejects questions longer than 500 characters", async () => {
+      const longQuestion = "a".repeat(501);
+      const response = await request(app)
+        .post("/graphql")
+        .send({
+          query: `
+            query Search($question: String!) {
+              search(question: $question) {
+                answer
+              }
+            }
+          `,
+          variables: { question: longQuestion },
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.errors).toBeDefined();
+      expect(response.body.errors[0].message).toContain(
+        "zwischen 3 und 500 Zeichen"
+      );
+
+      expect(mockedEmbedText).not.toHaveBeenCalled();
     });
   });
 

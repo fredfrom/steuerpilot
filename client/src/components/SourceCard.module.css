@@ -25,14 +25,27 @@
   line-height: 1.4;
 }
 
-.score {
+.relevance {
   flex-shrink: 0;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #276749;
-  background-color: #c6f6d5;
+  font-size: 0.7rem;
+  font-weight: 600;
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
+}
+
+.relevanceHigh {
+  color: #276749;
+  background-color: #c6f6d5;
+}
+
+.relevanceMedium {
+  color: #744210;
+  background-color: #fefcbf;
+}
+
+.relevanceLow {
+  color: #9b2c2c;
+  background-color: #fed7d7;
 }
 
 .meta {
@@ -55,4 +68,11 @@
 
 .separator {
   color: #cbd5e0;
+}
+
+.tldr {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #718096;
 }

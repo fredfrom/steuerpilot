@@ -90,3 +90,15 @@ Entry point for users without a specific question.
 The Bundesfinanzhof publishes rulings publicly.
 Combining BMF-Schreiben + BFH case law would be significant added value over existing tools.
 Separate project — considerably higher complexity.
+
+### N9 · Timeline/Changelog-Ansicht
+
+Chronologische Übersicht aller BMF-Schreiben-Änderungen, damit Nutzer sehen können was sie verpasst haben. Requires bulk ingestion corpus.
+
+### N10 · Themen-Tags
+
+Automatische Klassifizierung nach populären Steuer-Themen (Homeoffice, Dienstwagen, Abschreibungen, Fahrtkosten, E-Fahrzeuge etc.) via LLM-Klassifizierung während der Ingestion.
+
+### N11 · "Mehr laden"
+
+Pagination der Suchergebnisse wenn Nutzerdaten zeigen dass mehr als 5 Quellen gewünscht werden.

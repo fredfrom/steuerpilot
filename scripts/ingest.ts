@@ -1,3 +1,4 @@
+import { Mistral } from "@mistralai/mistralai";
 import axios from "axios";
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
@@ -72,6 +73,7 @@ const bmfChunkSchema = new mongoose.Schema({
   chunk_index: { type: Number, required: true },
   text: { type: String, required: true },
   embedding: { type: [Number], required: true },
+  tldr: { type: String, default: null },
   metadata: {
     date: { type: String, required: true },
     gz: { type: String, required: true },
@@ -89,6 +91,39 @@ const BmfChunk = mongoose.model("BmfChunk", bmfChunkSchema, "bmf_chunks");
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const TLDR_SYSTEM_PROMPT =
+  "Fasse den folgenden Abschnitt aus einem BMF-Schreiben in 1-2 prägnanten Sätzen zusammen. Nur die Zusammenfassung, keine Einleitung.";
+const TLDR_DELAY_MS = 500;
+
+/**
+ * Generate a short TLDR summary for a chunk of text via Mistral.
+ * Returns null on any failure — TLDR is non-critical.
+ */
+async function generateTldr(chunkText: string): Promise<string | null> {
+  const apiKey = process.env.MISTRAL_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const client = new Mistral({ apiKey });
+    const response = await client.chat.complete(
+      {
+        model: "mistral-small-latest",
+        messages: [
+          { role: "system", content: TLDR_SYSTEM_PROMPT },
+          { role: "user", content: chunkText },
+        ],
+        maxTokens: 150,
+      },
+      { timeoutMs: 30_000 }
+    );
+    const content = response.choices?.[0]?.message?.content;
+    if (typeof content !== "string") return null;
+    return content.trim();
+  } catch {
+    return null;
+  }
 }
 
 /** Decode common XML/HTML entities */
@@ -320,7 +355,8 @@ export async function embedChunks(chunks: string[]): Promise<number[][]> {
 export async function upsertToMongodb(
   chunks: string[],
   embeddings: number[][],
-  metadata: BmfDocumentMetadata
+  metadata: BmfDocumentMetadata,
+  tldrs: (string | null)[] = []
 ): Promise<UpsertResult> {
   const docId = extractDocId(metadata.bmf_url);
 
@@ -333,6 +369,7 @@ export async function upsertToMongodb(
           chunk_index: index,
           text,
           embedding: embeddings[index],
+          tldr: tldrs[index] ?? null,
           metadata: {
             ...metadata,
             is_superseded: false,
@@ -427,9 +464,22 @@ export async function runIngestion(
         const embeddings = await embedChunks(chunks);
         console.log(`  Generated ${String(embeddings.length)} embeddings`);
 
+        // Step 5.5: Generate TLDRs
+        console.log(`  Generating TLDRs for ${entry.title}...`);
+        const tldrs: (string | null)[] = [];
+        for (let ci = 0; ci < chunks.length; ci++) {
+          const tldr = await generateTldr(chunks[ci]!);
+          tldrs.push(tldr);
+          if (ci < chunks.length - 1) {
+            await sleep(TLDR_DELAY_MS);
+          }
+        }
+        const tldrCount = tldrs.filter((t) => t !== null).length;
+        console.log(`  Generated ${String(tldrCount)}/${String(chunks.length)} TLDRs`);
+
         // Step 6: Upsert to MongoDB
         console.log("  Upserting to MongoDB...");
-        const result = await upsertToMongodb(chunks, embeddings, metadata);
+        const result = await upsertToMongodb(chunks, embeddings, metadata, tldrs);
         console.log(
           `  Inserted: ${String(result.inserted)}, Skipped: ${String(result.skipped)}`
         );

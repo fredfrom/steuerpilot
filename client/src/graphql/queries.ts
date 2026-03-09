@@ -11,6 +11,7 @@ export const SEARCH_QUERY = gql`
         steuerart
         bmfUrl
         relevanceScore
+        tldr
       }
     }
   }
@@ -36,6 +37,7 @@ export interface Source {
   steuerart: string
   bmfUrl: string
   relevanceScore: number
+  tldr: string | null
 }
 
 export interface SearchData {

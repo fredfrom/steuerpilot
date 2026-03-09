@@ -5,6 +5,7 @@ export interface Source {
   steuerart: string;
   bmfUrl: string;
   relevanceScore: number;
+  tldr: string | null;
 }
 
 export interface SearchResult {
@@ -31,6 +32,7 @@ export interface VectorSearchOptions {
 
 export interface VectorSearchResult {
   text: string;
+  tldr: string | null;
   metadata: {
     date: string;
     gz: string;

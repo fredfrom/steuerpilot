@@ -5,9 +5,13 @@ interface SourceCardProps {
   source: Source
 }
 
-export function SourceCard({ source }: SourceCardProps) {
-  const scorePercent = Math.round(source.relevanceScore * 100)
+function relevanceClass(score: number): string {
+  if (score >= 0.8) return styles.relevanceHigh
+  if (score >= 0.6) return styles.relevanceMedium
+  return styles.relevanceLow
+}
 
+export function SourceCard({ source }: SourceCardProps) {
   return (
     <article className={styles.card}>
       <div className={styles.titleRow}>
@@ -19,7 +23,9 @@ export function SourceCard({ source }: SourceCardProps) {
         >
           {source.title}
         </a>
-        <span className={styles.score}>{scorePercent}%</span>
+        <span className={`${styles.relevance} ${relevanceClass(source.relevanceScore)}`}>
+          Relevanz
+        </span>
       </div>
       <div className={styles.meta}>
         <span className={styles.badge}>{source.steuerart}</span>
@@ -28,6 +34,9 @@ export function SourceCard({ source }: SourceCardProps) {
         <span className={styles.separator}>|</span>
         <span>{source.gz}</span>
       </div>
+      {source.tldr && (
+        <p className={styles.tldr}>{source.tldr}</p>
+      )}
     </article>
   )
 }

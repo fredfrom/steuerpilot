@@ -6,6 +6,7 @@ const bmfChunkSchema = new mongoose.Schema<IBmfChunkDocument>({
   chunk_index: { type: Number, required: true },
   text: { type: String, required: true },
   embedding: { type: [Number], required: true },
+  tldr: { type: String, default: null },
   metadata: {
     date: { type: String, required: true },
     gz: { type: String, required: true },
