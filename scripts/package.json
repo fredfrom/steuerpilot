@@ -1,0 +1,20 @@
+{
+  "name": "steuerpilot-scripts",
+  "version": "1.0.0",
+  "description": "Steuerpilot ingestion pipeline scripts",
+  "type": "module",
+  "main": "ingest.js",
+  "scripts": {
+    "ingest": "node ingest.js",
+    "test": "jest --forceExit"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/textsplitters": "^1.0.1",
+    "axios": "^1.13.6",
+    "dotenv": "^17.3.1",
+    "mongoose": "^9.2.4",
+    "pdf-parse": "^2.4.5"
+  }
+}

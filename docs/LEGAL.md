@@ -50,6 +50,40 @@ Disallow: /SharedDocs/
 
 ---
 
+## DSGVO — Third-Party Asset Loading
+
+### The core legal issue
+
+When a browser loads a resource from an external server (CDN, font provider, analytics service), it sends the user's IP address to that server. Under DSGVO Art. 6, this constitutes processing of personal data and requires a lawful basis.
+
+**LG München I, Az. 3 O 17493/20 (2022):** A website operator was ordered to pay €100 damages for loading Google Fonts via Google's CDN without user consent. The court held that the IP address transfer had no lawful basis. This ruling was confirmed in follow-up cases through 2023–2025.
+
+The rule is not "servers must be in Germany." It is about IP transmission to third parties without consent. A CDN with EU nodes (Cloudflare, jsDelivr) has the same problem — the IP still leaves the user's browser to a third-party operator.
+
+### What this means for Steuerpilot
+
+Prohibited at page load without prior consent:
+- Google Fonts CDN (fonts.googleapis.com)
+- Any CDN-hosted JS/CSS (cdnjs.cloudflare.com, cdn.jsdelivr.net, unpkg.com)
+- Google Analytics, Plausible cloud, or any analytics beacon
+- Any external image or tracking pixel
+
+Required approach:
+- All fonts: self-hosted in client/public/fonts/, served from our domain
+- All JS/CSS libraries: installed via npm, bundled by Vite into client/dist/
+- No runtime browser-to-third-party connections without explicit user opt-in
+
+Server-to-third-party calls (permitted — no user IP forwarded):
+- HuggingFace, Mistral, Groq: backend only
+- bundesfinanzministerium.de: cron job only
+
+### Automated enforcement
+
+scripts/dsgvo-check.js scans source files and built output for violations.
+It is a blocking step at every milestone gate. See CLAUDE.md for details.
+
+---
+
 ## Data Minimisation
 
 In line with GDPR best practices:

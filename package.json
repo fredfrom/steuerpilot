@@ -1,0 +1,9 @@
+{
+  "name": "steuerpilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Steuerpilot — RAG-based semantic search for German BMF-Schreiben",
+  "scripts": {
+    "dsgvo-check": "node scripts/dsgvo-check.js"
+  }
+}

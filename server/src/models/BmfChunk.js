@@ -1,0 +1,21 @@
+import mongoose from "mongoose";
+
+const bmfChunkSchema = new mongoose.Schema({
+  doc_id: { type: String, required: true, index: true },
+  chunk_index: { type: Number, required: true },
+  text: { type: String, required: true },
+  embedding: { type: [Number], required: true },
+  metadata: {
+    date: { type: String, required: true },
+    gz: { type: String, required: true },
+    steuerart: { type: String, required: true },
+    title: { type: String, required: true },
+    bmf_url: { type: String, required: true },
+    paragraphen: { type: [String], default: [] },
+    is_superseded: { type: Boolean, default: false },
+  },
+});
+
+bmfChunkSchema.index({ doc_id: 1, chunk_index: 1 }, { unique: true });
+
+export const BmfChunk = mongoose.model("BmfChunk", bmfChunkSchema);
