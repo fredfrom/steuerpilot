@@ -5,6 +5,14 @@ import type {
   VectorSearchResult,
 } from "../types/search.types.js";
 
+// TODO: Calibrate threshold after bulk ingestion of all 509 BMF-Schreiben.
+// Current value (0.75) was set against a 14-document index where score
+// distribution is artificially compressed — all chunks score high regardless
+// of relevance because the corpus is too small. With the full corpus, out-of-scope
+// queries will score lower and this threshold will work as intended.
+// To calibrate: check Render logs for score values on 5-10 known good queries
+// and 5-10 out-of-scope queries. Set threshold just above the out-of-scope ceiling.
+// Typical target range: 0.72–0.82 depending on corpus and embedding model.
 const SIMILARITY_THRESHOLD = 0.75;
 
 /**

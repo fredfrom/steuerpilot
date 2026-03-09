@@ -5,6 +5,8 @@ Semantic search engine for German tax authority rulings (BMF-Schreiben).
 Ask a question in plain German. Get a direct answer with a source link to the original document on bundesfinanzministerium.de.
 
 > **Demo:** [coming soon] · **Stack:** React · Apollo GraphQL · Node.js · MongoDB Atlas · Mistral API
+>
+> ⚠️ Hosted on Render free tier — first request after inactivity may take ~30s (cold start). Subsequent requests are fast.
 
 ---
 

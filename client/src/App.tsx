@@ -74,9 +74,10 @@ export default function App() {
             <em>endlich verständlich</em>
           </h1>
           <p className={styles.heroDesc}>
-            KI-gestützte Suche in allen aktuellen Verwaltungsanweisungen des
-            Bundesfinanzministeriums. Für Steuerberater, die präzise Antworten
-            mit direkten Quellenangaben brauchen.
+            Fragen stellen statt Seiten blättern. Steuerpilot durchsucht alle
+            aktuellen BMF-Schreiben semantisch — nicht nach Stichwörtern,
+            sondern nach Bedeutung — und liefert Antworten mit direktem
+            Quellenlink.
           </p>
 
           <div className={styles.statsRow}>
