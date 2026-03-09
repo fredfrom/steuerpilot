@@ -5,6 +5,8 @@ import type {
   VectorSearchResult,
 } from "../types/search.types.js";
 
+const SIMILARITY_THRESHOLD = 0.75;
+
 /**
  * Perform a MongoDB Atlas vector search on the bmf_chunks collection.
  * Uses the "vector_index" with cosine similarity and 1024 dimensions.
@@ -48,7 +50,7 @@ export async function searchChunks(
 
   try {
     const results = await BmfChunk.aggregate<VectorSearchResult>(pipeline);
-    return results;
+    return results.filter((r) => r.score >= SIMILARITY_THRESHOLD);
   } catch (error: unknown) {
     throw new VectorSearchError("Vector search aggregation failed", error);
   }

@@ -99,4 +99,42 @@ describe("searchChunks", () => {
       VectorSearchError
     );
   });
+
+  it("returns all results when all scores are above threshold", async () => {
+    const aboveThreshold = [
+      { ...MOCK_RESULTS[0]!, score: 0.82 },
+      { ...MOCK_RESULTS[0]!, score: 0.79 },
+    ];
+    mockedBmfChunk.aggregate.mockResolvedValueOnce(aboveThreshold);
+
+    const results = await searchChunks(QUERY_EMBEDDING);
+
+    expect(results).toHaveLength(2);
+  });
+
+  it("returns empty array when all scores are below threshold", async () => {
+    const belowThreshold = [
+      { ...MOCK_RESULTS[0]!, score: 0.65 },
+      { ...MOCK_RESULTS[0]!, score: 0.71 },
+    ];
+    mockedBmfChunk.aggregate.mockResolvedValueOnce(belowThreshold);
+
+    const results = await searchChunks(QUERY_EMBEDDING);
+
+    expect(results).toHaveLength(0);
+  });
+
+  it("filters out results below similarity threshold", async () => {
+    const mixedScores = [
+      { ...MOCK_RESULTS[0]!, score: 0.82 },
+      { ...MOCK_RESULTS[0]!, score: 0.71 },
+      { ...MOCK_RESULTS[0]!, score: 0.90 },
+    ];
+    mockedBmfChunk.aggregate.mockResolvedValueOnce(mixedScores);
+
+    const results = await searchChunks(QUERY_EMBEDDING);
+
+    expect(results).toHaveLength(2);
+    expect(results.every((r) => r.score >= 0.75)).toBe(true);
+  });
 });
