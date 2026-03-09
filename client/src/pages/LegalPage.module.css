@@ -1,56 +1,80 @@
 .container {
-  max-width: 700px;
+  max-width: 760px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 48px 48px 60px;
+  background: var(--white);
+  min-height: 100vh;
 }
 
 .nav {
-  margin-bottom: 1.5rem;
+  margin-bottom: 32px;
 }
 
 .backLink {
-  font-size: 0.9rem;
-  color: #2b6cb0;
+  font-size: 13px;
+  color: var(--accent-mid);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.backLink:hover {
+  color: var(--accent);
 }
 
 .heading {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #1a365d;
-  margin-bottom: 1.5rem;
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 32px;
+  letter-spacing: -0.02em;
 }
 
 .subheading {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
 }
 
 .section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 28px;
 }
 
 .text {
   line-height: 1.7;
-  color: #4a5568;
-  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 300;
 }
 
 .list {
   padding-left: 1.5rem;
   line-height: 1.7;
-  color: #4a5568;
-  margin-bottom: 0.5rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 300;
 }
 
 .list li {
-  margin-bottom: 0.25rem;
+  margin-bottom: 4px;
 }
 
 .footer {
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e2e8f0;
-  font-size: 0.9rem;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.footer a {
+  color: var(--accent-mid);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer a:hover {
+  color: var(--accent);
 }

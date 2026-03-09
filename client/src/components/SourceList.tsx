@@ -10,8 +10,8 @@ export function SourceList({ sources }: SourceListProps) {
   if (sources.length === 0) return null
 
   return (
-    <section className={styles.container}>
-      <h3 className={styles.heading}>Quellen</h3>
+    <section>
+      <div className={styles.header}>Quellen</div>
       <div className={styles.list}>
         {sources.map((source, index) => (
           <SourceCard key={`${source.bmfUrl}-${index}`} source={source} />

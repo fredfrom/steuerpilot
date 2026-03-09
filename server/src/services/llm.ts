@@ -141,7 +141,7 @@ async function callGroq(
 }
 
 const TLDR_SYSTEM_PROMPT =
-  "Fasse den folgenden Abschnitt aus einem BMF-Schreiben in 1-2 prägnanten Sätzen zusammen. Nur die Zusammenfassung, keine Einleitung.";
+  "Du bist ein präziser Assistent für deutsche Steuerrecht-Zusammenfassungen. Fasse den folgenden Textauszug aus einem BMF-Schreiben in 1-3 Sätzen zusammen. Wenn das Schreiben mehrere Themenbereiche abdeckt, nenne die wichtigsten explizit am Ende der Zusammenfassung. Antworte ausschließlich mit der Zusammenfassung, ohne Einleitung oder Kommentar. Keine Anführungszeichen. Kein Markdown.";
 const TLDR_MAX_TOKENS = 150;
 
 /**

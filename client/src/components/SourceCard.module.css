@@ -1,78 +1,97 @@
 .card {
-  background-color: #f7fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  transition: box-shadow 0.15s;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 10px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
 }
 
 .card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: var(--accent);
+  box-shadow: 0 3px 14px rgba(26, 58, 92, 0.09);
+  transform: translateY(-1px);
 }
 
-.titleRow {
+.headerRow {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .title {
-  font-weight: 600;
-  color: #2b6cb0;
-  font-size: 0.95rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
   line-height: 1.4;
+  flex: 1;
 }
 
-.relevance {
+.linkIcon {
+  color: var(--text-light);
+  font-size: 12px;
   flex-shrink: 0;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  margin-top: 2px;
+  transition: color 0.15s;
 }
 
-.relevanceHigh {
-  color: #276749;
-  background-color: #c6f6d5;
+.card:hover .linkIcon {
+  color: var(--accent);
 }
 
-.relevanceMedium {
-  color: #744210;
-  background-color: #fefcbf;
+.tldr {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 12px;
+  font-weight: 300;
+  font-style: italic;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  transition: border-color 0.15s;
 }
 
-.relevanceLow {
-  color: #9b2c2c;
-  background-color: #fed7d7;
+.card:hover .tldr {
+  border-left-color: var(--accent-mid);
 }
 
 .meta {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
   align-items: center;
-  font-size: 0.85rem;
-  color: #718096;
+  flex-wrap: wrap;
 }
 
 .badge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #1a365d;
-  background-color: #bee3f8;
-  padding: 0.1rem 0.5rem;
-  border-radius: 9999px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
 }
 
-.separator {
-  color: #cbd5e0;
+.badgeCat {
+  background: var(--accent-light);
+  color: var(--accent);
 }
 
-.tldr {
-  margin-top: 0.5rem;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: #718096;
+.badgeId {
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.metaDate {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.metaSep {
+  color: var(--border-dark);
+  font-size: 11px;
 }

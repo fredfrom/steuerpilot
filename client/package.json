@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
+    "@fontsource/dm-sans": "^5.2.8",
+    "@fontsource/fraunces": "^5.2.9",
     "graphql": "^16.13.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

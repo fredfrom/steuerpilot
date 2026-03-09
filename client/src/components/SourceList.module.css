@@ -1,16 +1,23 @@
-.container {
-  margin-top: 1.5rem;
+.header {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.heading {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1a365d;
-  margin-bottom: 0.75rem;
+.header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }

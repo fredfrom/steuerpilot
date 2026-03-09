@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react'
-import { useLazyQuery } from '@apollo/client/react'
-import { SEARCH_QUERY, type SearchData } from './graphql/queries'
+import { useQuery, useLazyQuery } from '@apollo/client/react'
+import {
+  SEARCH_QUERY,
+  STATS_QUERY,
+  type SearchData,
+  type StatsData,
+} from './graphql/queries'
+import { Header } from './components/Header'
 import { SearchForm } from './components/SearchForm'
 import { AnswerDisplay } from './components/AnswerDisplay'
 import { SourceList } from './components/SourceList'
-import { StatsBar } from './components/StatsBar'
 import { ErrorMessage } from './components/ErrorMessage'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { FaqSection } from './components/FaqSection'
@@ -27,6 +32,7 @@ const SOFTWARE_JSON_LD = JSON.stringify({
 })
 
 export default function App() {
+  const { data: statsData } = useQuery<StatsData>(STATS_QUERY)
   const [selectedSteuerart, setSelectedSteuerart] = useState<string>('')
   const [executeSearch, { data, loading, error }] =
     useLazyQuery<SearchData>(SEARCH_QUERY)
@@ -51,36 +57,60 @@ export default function App() {
     void executeSearch({ variables: { question, steuerart } })
   }
 
+  const totalDocuments = statsData?.stats.totalDocuments
+  const lastUpdated = statsData?.stats.lastUpdated
+  const categories = statsData?.stats.byCategory ?? []
+
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Steuerpilot</h1>
-        <p className={styles.subtitle}>Semantische Suche in BMF-Schreiben</p>
-      </header>
+    <>
+      <Header lastUpdated={lastUpdated} />
 
-      <section className={styles.valueProp}>
-        <h2 className={styles.valuePropHeading}>BMF-Schreiben auf Knopfdruck verstehen</h2>
-        <p className={styles.valuePropText}>
-          Steuerpilot durchsucht alle aktuellen BMF-Schreiben des
-          Bundesfinanzministeriums semantisch — nicht nur nach Stichworten,
-          sondern nach Bedeutung. Stellen Sie Ihre Frage auf Deutsch und
-          erhalten Sie eine präzise Antwort mit direkten Quellenangaben.
-          Kostenlos, ohne Anmeldung, für Steuerberater und Steuerprofis.
-        </p>
-      </section>
+      <div className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.eyebrow}>Semantische Steuerrecherche</div>
+          <h1 className={styles.heroTitle}>
+            BMF-Schreiben
+            <br />
+            <em>endlich verständlich</em>
+          </h1>
+          <p className={styles.heroDesc}>
+            KI-gestützte Suche in allen aktuellen Verwaltungsanweisungen des
+            Bundesfinanzministeriums. Für Steuerberater, die präzise Antworten
+            mit direkten Quellenangaben brauchen.
+          </p>
 
-      <div className={styles.statsSection}>
-        <StatsBar
-          selectedSteuerart={selectedSteuerart}
-          onSteuerartChange={setSelectedSteuerart}
-        />
+          <div className={styles.statsRow}>
+            <div className={styles.statItem}>
+              <span className={styles.statNumber}>
+                {totalDocuments ?? '—'}
+              </span>
+              <span className={styles.statLabel}>BMF-Schreiben</span>
+            </div>
+            <div className={styles.statDivider} />
+            <div className={styles.statItem}>
+              <span className={styles.statNumber}>Täglich</span>
+              <span className={styles.statLabel}>
+                Automatisch aktualisiert
+              </span>
+            </div>
+            <div className={styles.statDivider} />
+            <div className={styles.statItem}>
+              <span className={styles.statNumber}>Kostenlos</span>
+              <span className={styles.statLabel}>Keine Anmeldung nötig</span>
+            </div>
+          </div>
+
+          <SearchForm
+            onSearch={handleSearch}
+            loading={loading}
+            categories={categories}
+            selectedSteuerart={selectedSteuerart}
+            onSteuerartChange={setSelectedSteuerart}
+          />
+        </div>
       </div>
 
-      <div className={styles.searchSection}>
-        <SearchForm onSearch={handleSearch} loading={loading} />
-      </div>
-
-      <div className={styles.results}>
+      <main className={styles.content}>
         {loading && <LoadingSpinner />}
 
         {error && <ErrorMessage message={error.message} />}
@@ -92,22 +122,33 @@ export default function App() {
               <SourceList sources={data.search.sources} />
             ) : (
               <p className={styles.noResults}>
-                Keine relevanten BMF-Schreiben gefunden. Bitte formulieren
-                Sie Ihre Frage spezifischer.
+                Keine relevanten BMF-Schreiben gefunden. Bitte formulieren Sie
+                Ihre Frage spezifischer.
               </p>
             )}
           </>
         )}
+
+        {!data?.search && <FaqSection />}
+      </main>
+
+      <div className={styles.footerDisclaimer}>
+        <p>
+          <strong>Haftungsausschluss:</strong> Steuerpilot ersetzt keine
+          steuerliche oder rechtliche Beratung. Alle Antworten dienen
+          ausschließlich der ersten Orientierung. Prüfen Sie stets die
+          verlinkten Originalquellen des Bundesfinanzministeriums. Keine Gewähr
+          für Vollständigkeit, Richtigkeit oder Aktualität. Dieses Tool ist ein
+          nicht-kommerzielles Demonstrationsprojekt ohne Erwerbszweck.
+        </p>
       </div>
 
-      {!data?.search && <FaqSection />}
+      <Footer />
 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: SOFTWARE_JSON_LD }}
       />
-
-      <Footer />
-    </div>
+    </>
   )
 }

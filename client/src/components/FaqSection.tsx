@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import styles from './FaqSection.module.css'
 
 interface FaqItem {
@@ -35,36 +34,19 @@ const FAQ_ITEMS: FaqItem[] = [
 ]
 
 export function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
-
-  const toggle = (index: number): void => {
-    setOpenIndex((prev) => (prev === index ? null : index))
-  }
-
   return (
-    <section className={styles.section}>
-      <h2 className={styles.heading}>Häufig gestellte Fragen</h2>
-      <div className={styles.accordion}>
-        {FAQ_ITEMS.map((item, index) => (
-          <div key={item.question} className={styles.item}>
-            <button
-              className={styles.question}
-              onClick={() => toggle(index)}
-              aria-expanded={openIndex === index}
-            >
-              {item.question}
-              <span
-                className={`${styles.chevron} ${openIndex === index ? styles.chevronOpen : ''}`}
-              >
-                ▼
-              </span>
-            </button>
-            {openIndex === index && (
-              <div className={styles.answer}>{item.answer}</div>
-            )}
-          </div>
-        ))}
-      </div>
+    <section className={styles.faq}>
+      <h2 className={styles.title}>Häufig gestellte Fragen</h2>
+      <p className={styles.sub}>Was Sie über Steuerpilot wissen sollten</p>
+      {FAQ_ITEMS.map((item) => (
+        <details key={item.question} className={styles.item}>
+          <summary className={styles.question}>
+            {item.question}
+            <span className={styles.icon}>+</span>
+          </summary>
+          <p className={styles.answer}>{item.answer}</p>
+        </details>
+      ))}
 
       <script
         type="application/ld+json"

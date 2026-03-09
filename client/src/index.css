@@ -1,29 +1,35 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --bg: #fafaf8;
+  --white: #ffffff;
+  --surface: #f4f4f0;
+  --surface-warm: #f9f7f3;
+  --border: #e5e5e0;
+  --border-dark: #d0d0c8;
+  --text: #1a1a18;
+  --text-muted: #6b6b65;
+  --text-light: #9e9e96;
+  --accent: #1a3a5c;
+  --accent-light: #e8f0f8;
+  --accent-mid: #2d5a8e;
+  --red: #c0392b;
+  --green: #1a6b4a;
+  --amber: #92600a;
+  --amber-bg: #fef9ee;
+  --amber-border: #e8d5a0;
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: #1a202c;
-  background-color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
   line-height: 1.6;
 }
 
-a {
-  color: #2b6cb0;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
 }
