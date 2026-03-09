@@ -88,7 +88,7 @@ export function extractMetadata(text, url) {
  */
 export async function embedChunks(chunks) {
   // TODO: Call HuggingFace Inference API with batch input
-  // POST https://api-inference.huggingface.co/pipeline/feature-extraction/mixedbread-ai/deepset-mxbai-embed-de-large-v1
+  // POST https://router.huggingface.co/hf-inference/models/mixedbread-ai/deepset-mxbai-embed-de-large-v1/pipeline/feature-extraction
   // Headers: { Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}` }
   return chunks.map(() => new Array(1024).fill(0));
 }

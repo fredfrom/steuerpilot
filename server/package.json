@@ -24,6 +24,7 @@
     "express": "^5.2.1",
     "graphql": "^16.13.1",
     "graphql-tag": "^2.12.6",
+    "groq-sdk": "^0.37.0",
     "mongoose": "^9.2.4",
     "node-cron": "^4.2.1",
     "pdf-parse": "^2.4.5"

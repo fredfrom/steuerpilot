@@ -5,5 +5,8 @@
   "description": "Steuerpilot — RAG-based semantic search for German BMF-Schreiben",
   "scripts": {
     "dsgvo-check": "node scripts/dsgvo-check.js"
+  },
+  "dependencies": {
+    "mongodb": "^7.1.0"
   }
 }

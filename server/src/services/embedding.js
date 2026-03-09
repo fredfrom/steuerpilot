@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const HUGGINGFACE_API_URL =
-  "https://api-inference.huggingface.co/pipeline/feature-extraction/mixedbread-ai/deepset-mxbai-embed-de-large-v1";
+  "https://router.huggingface.co/hf-inference/models/mixedbread-ai/deepset-mxbai-embed-de-large-v1/pipeline/feature-extraction";
 
 /**
  * Embed a single text string using the HuggingFace Inference API.
