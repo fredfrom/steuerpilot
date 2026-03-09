@@ -73,6 +73,12 @@ npm run ingest
 
 ---
 
+## Known Limitations
+
+- MongoDB Atlas network access set to `0.0.0.0/0` due to Render free tier dynamic IPs. Production fix: Render static IP add-on ($) + Atlas IP whitelist.
+
+---
+
 ## Disclaimer
 
 **Demo / Proof of Concept** — This project is an experimental tool built to explore RAG pipelines applied to German tax law. It is free to use, provided as-is, with no guarantees of accuracy, completeness or availability. Nothing in this tool constitutes legal or tax advice. Always consult a licensed Steuerberater for binding guidance. Maßgeblich ist stets das Originaldokument auf [bundesfinanzministerium.de](https://www.bundesfinanzministerium.de).
