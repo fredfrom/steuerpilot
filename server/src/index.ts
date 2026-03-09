@@ -80,10 +80,19 @@ const graphqlLimiter = rateLimit({
   },
 });
 
+const corsOptions: cors.CorsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.options("*", cors(corsOptions));
+
 app.use(
   "/graphql",
   graphqlLimiter,
-  cors({ origin: allowedOrigins }),
+  cors(corsOptions),
   express.json({ limit: "10kb" }),
   expressMiddleware(server, {
     context: async ({ req }): Promise<ApolloContext> => ({ req }),

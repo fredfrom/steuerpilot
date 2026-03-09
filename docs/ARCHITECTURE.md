@@ -35,12 +35,43 @@ bundesfinanzministerium.de
 
 ## Ingestion Pipeline
 
-Runs daily via cron. Processes only new documents.
+Two distinct ingestion paths serve different purposes:
+
+### Path 1 — Bulk backfill (one-time)
+
+| | |
+|---|---|
+| Script | `scripts/ingest_bulk_local.py` |
+| Runs on | Developer machine (local, never on server) |
+| Scope | All 51 listing pages on bundesfinanzministerium.de (~509 documents) |
+| Embeddings | Local sentence-transformers (CPU) — avoids HuggingFace API costs for large batch |
+| Idempotent | Upserts on `{doc_id, chunk_index}` — safe to re-run |
+| Command | `python3 scripts/ingest_bulk_local.py [--dry-run] [--limit N]` |
 
 ```
-1. Scrape BMF listing page → collect all PDF URLs
-2. Hash URL + version number → check against MongoDB (already indexed?)
-3. New only: fetch PDF into memory via fetch() — never write to disk
+1. Crawl all 51 BMF listing pages → collect PDF URLs
+2. For each document: check MongoDB (already ingested?) → skip if yes
+3. Fetch PDF into memory → extract text with pdfplumber
+4. Chunk: recursive split (1000 chars, 200 overlap, German legal separators)
+5. Embed locally: mxbai-embed-de-large-v1 via sentence-transformers (1024 dims)
+6. Upsert chunks + metadata into MongoDB Atlas
+7. Buffer garbage-collected — no PDF bytes remain on disk or in memory
+```
+
+### Path 2 — Daily incremental updates (automated)
+
+| | |
+|---|---|
+| Script | `scripts/ingest.ts` |
+| Runs on | Server via node-cron (`0 6 * * *` — 6am daily, configurable via CRON_SCHEDULE) |
+| Scope | New documents only (checks BMF listing for unseen URLs) |
+| Embeddings | HuggingFace Inference API (negligible cost at 2–5 new docs/week) |
+| Triggered by | Cron schedule registered on server startup in `server/src/index.ts` |
+
+```
+1. Scrape BMF listing page → collect PDF URLs
+2. Check each URL against MongoDB → skip already-indexed documents
+3. New only: fetch PDF into memory via axios — never write to disk
 4. Extract text: pdf-parse (UTF-8, German umlauts handled)
 5. Chunk: RecursiveCharacterTextSplitter
    - chunkSize: 512 tokens

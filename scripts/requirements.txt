@@ -3,3 +3,5 @@ sentence-transformers
 pymongo
 requests
 beautifulsoup4
+numpy<2
+torch>=2.4

@@ -242,8 +242,8 @@ def fetch_page(session: requests.Session, page_number: int) -> list[BmfDocument]
     for link in soup.find_all("a", href=True):
         href = link["href"]
         # Resolve relative URLs
-        if href.startswith("/"):
-            href = BMF_BASE_URL + href
+        if not href.startswith("http"):
+            href = BMF_BASE_URL + "/" + href.lstrip("/")
 
         # Only process BMF-Schreiben downloads
         if BMF_SCHREIBEN_PATH_FILTER not in href:
@@ -274,8 +274,8 @@ def extract_pdf_url_from_detail_page(
     for link in soup.find_all("a", href=True):
         href = link["href"]
         if "__blob=publicationFile" in href:
-            if href.startswith("/"):
-                return BMF_BASE_URL + href
+            if not href.startswith("http"):
+                return BMF_BASE_URL + "/" + href.lstrip("/")
             return href
 
     return ""

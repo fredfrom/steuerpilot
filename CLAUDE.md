@@ -22,17 +22,20 @@ cd scripts && npm test          # jest
 # DSGVO compliance check (must pass before any commit or deploy)
 node scripts/dsgvo-check.js
 
-# Ingestion (run once to seed MongoDB)
-node scripts/ingest.js
+# Bulk backfill (one-time, runs locally on developer machine)
+# Crawls all 51 BMF listing pages, embeds locally via sentence-transformers (CPU).
+# Idempotent — upserts on {doc_id, chunk_index}, safe to re-run.
+pip3 install -r scripts/requirements.txt
+python3 scripts/ingest_bulk_local.py [--dry-run] [--limit N]
+
+# Daily incremental ingestion (automated on server)
+# Runs via node-cron (CRON_SCHEDULE, default "0 6 * * *").
+# Watches BMF listing for new documents only, embeds via HuggingFace Inference API.
+# Triggered automatically on server startup — no manual action needed.
 
 # Lint
 cd server && npm run lint
 cd client && npm run lint
-
-# Bulk ingestion (one-off local Python script)
-# Uses sentence-transformers for embeddings (CPU). Never called by the application.
-pip install sentence-transformers pymongo requests beautifulsoup4 pdfplumber python-dotenv
-python scripts/ingest_bulk_local.py [--dry-run] [--limit N]
 ```
 
 ---
