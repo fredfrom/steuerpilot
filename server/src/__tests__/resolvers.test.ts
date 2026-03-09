@@ -174,6 +174,202 @@ describe("GraphQL resolvers", () => {
       });
     });
 
+    it("deduplicates sources by bmfUrl, keeping the highest relevanceScore", async () => {
+      const duplicateChunks = [
+        {
+          text: "Chunk 1 from document A.",
+          metadata: {
+            date: "2023-01-01",
+            gz: "IV C 6",
+            steuerart: "Einkommensteuer",
+            title: "Document A",
+            bmf_url: "https://www.bundesfinanzministerium.de/docA",
+            paragraphen: [],
+            is_superseded: false,
+          },
+          score: 0.85,
+        },
+        {
+          text: "Chunk 2 from document A (higher score).",
+          metadata: {
+            date: "2023-01-01",
+            gz: "IV C 6",
+            steuerart: "Einkommensteuer",
+            title: "Document A",
+            bmf_url: "https://www.bundesfinanzministerium.de/docA",
+            paragraphen: [],
+            is_superseded: false,
+          },
+          score: 0.92,
+        },
+        {
+          text: "Chunk from document B.",
+          metadata: {
+            date: "2023-06-15",
+            gz: "IV C 7",
+            steuerart: "Umsatzsteuer",
+            title: "Document B",
+            bmf_url: "https://www.bundesfinanzministerium.de/docB",
+            paragraphen: [],
+            is_superseded: false,
+          },
+          score: 0.88,
+        },
+      ];
+
+      mockedEmbedText.mockResolvedValueOnce(MOCK_EMBEDDING);
+      mockedSearchChunks.mockResolvedValueOnce(duplicateChunks);
+      mockedGenerateAnswer.mockResolvedValueOnce(MOCK_ANSWER);
+
+      const response = await request(app)
+        .post("/graphql")
+        .send({
+          query: `
+            query Search($question: String!) {
+              search(question: $question) {
+                answer
+                sources {
+                  title
+                  bmfUrl
+                  relevanceScore
+                }
+              }
+            }
+          `,
+          variables: { question: "test dedup" },
+        });
+
+      expect(response.status).toBe(200);
+      const searchResult = response.body.data.search;
+
+      // Two chunks from docA should be deduplicated to one
+      expect(searchResult.sources).toHaveLength(2);
+
+      // Document A should have the higher score (0.92, not 0.85)
+      const docA = searchResult.sources.find(
+        (s: { bmfUrl: string }) =>
+          s.bmfUrl === "https://www.bundesfinanzministerium.de/docA"
+      );
+      expect(docA).toBeDefined();
+      expect(docA.relevanceScore).toBe(0.92);
+
+      // Document B should be present
+      const docB = searchResult.sources.find(
+        (s: { bmfUrl: string }) =>
+          s.bmfUrl === "https://www.bundesfinanzministerium.de/docB"
+      );
+      expect(docB).toBeDefined();
+      expect(docB.relevanceScore).toBe(0.88);
+
+      // generateAnswer should receive only the deduplicated chunks
+      expect(mockedGenerateAnswer).toHaveBeenCalledWith(
+        "test dedup",
+        expect.arrayContaining([
+          expect.objectContaining({
+            text: "Chunk 2 from document A (higher score).",
+          }),
+          expect.objectContaining({
+            text: "Chunk from document B.",
+          }),
+        ])
+      );
+      // Verify it received exactly 2 chunks, not 3
+      const llmChunksArg = mockedGenerateAnswer.mock.calls[0]?.[1];
+      expect(llmChunksArg).toHaveLength(2);
+    });
+
+    it("deduplicates by title when bmfUrl is empty", async () => {
+      const chunksWithEmptyUrl = [
+        {
+          text: "Chunk 1 from unknown-URL document.",
+          metadata: {
+            date: "2024-01-01",
+            gz: "IV C 8",
+            steuerart: "Gewerbesteuer",
+            title: "Same Title Document",
+            bmf_url: "",
+            paragraphen: [],
+            is_superseded: false,
+          },
+          score: 0.80,
+        },
+        {
+          text: "Chunk 2 from unknown-URL document (higher score).",
+          metadata: {
+            date: "2024-01-01",
+            gz: "IV C 8",
+            steuerart: "Gewerbesteuer",
+            title: "Same Title Document",
+            bmf_url: "",
+            paragraphen: [],
+            is_superseded: false,
+          },
+          score: 0.90,
+        },
+        {
+          text: "Chunk from a document with a URL.",
+          metadata: {
+            date: "2024-02-01",
+            gz: "IV C 9",
+            steuerart: "Einkommensteuer",
+            title: "Different Document",
+            bmf_url: "https://www.bundesfinanzministerium.de/docC",
+            paragraphen: [],
+            is_superseded: false,
+          },
+          score: 0.85,
+        },
+      ];
+
+      mockedEmbedText.mockResolvedValueOnce(MOCK_EMBEDDING);
+      mockedSearchChunks.mockResolvedValueOnce(chunksWithEmptyUrl);
+      mockedGenerateAnswer.mockResolvedValueOnce(MOCK_ANSWER);
+
+      const response = await request(app)
+        .post("/graphql")
+        .send({
+          query: `
+            query Search($question: String!) {
+              search(question: $question) {
+                answer
+                sources {
+                  title
+                  bmfUrl
+                  relevanceScore
+                }
+              }
+            }
+          `,
+          variables: { question: "test title fallback" },
+        });
+
+      expect(response.status).toBe(200);
+      const searchResult = response.body.data.search;
+
+      // Two chunks with empty bmfUrl + same title → deduplicated to one
+      expect(searchResult.sources).toHaveLength(2);
+
+      // The empty-URL document should keep the higher score (0.90)
+      const sameTitle = searchResult.sources.find(
+        (s: { title: string }) => s.title === "Same Title Document"
+      );
+      expect(sameTitle).toBeDefined();
+      expect(sameTitle.relevanceScore).toBe(0.90);
+
+      // The document with a real URL should be present
+      const withUrl = searchResult.sources.find(
+        (s: { title: string }) => s.title === "Different Document"
+      );
+      expect(withUrl).toBeDefined();
+      expect(withUrl.bmfUrl).toBe(
+        "https://www.bundesfinanzministerium.de/docC"
+      );
+
+      // generateAnswer should receive exactly 2 deduplicated chunks
+      const llmChunksArg = mockedGenerateAnswer.mock.calls[0]?.[1];
+      expect(llmChunksArg).toHaveLength(2);
+    });
+
     it("returns a GraphQL validation error when question is missing", async () => {
       const response = await request(app)
         .post("/graphql")

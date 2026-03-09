@@ -8,10 +8,35 @@ import type {
   Source,
 } from "../types/search.types.js";
 import type { LlmContextChunk } from "../types/llm.types.js";
+import type { VectorSearchResult } from "../types/search.types.js";
+
+const MAX_UNIQUE_SOURCES = 5;
 
 interface SearchArgs {
   question: string;
   steuerart?: string;
+}
+
+/**
+ * Deduplicate chunks by source document, keeping the chunk with the highest score.
+ * Primary key: bmf_url. Fallback: title (for chunks where bmf_url is null/empty).
+ */
+function deduplicateBySource(
+  chunks: VectorSearchResult[]
+): VectorSearchResult[] {
+  const bestByKey = new Map<string, VectorSearchResult>();
+
+  for (const chunk of chunks) {
+    // Use bmf_url as primary dedup key; fall back to title for missing URLs
+    const url = chunk.metadata.bmf_url;
+    const dedupKey = url ? url : `title:${chunk.metadata.title}`;
+    const existing = bestByKey.get(dedupKey);
+    if (!existing || chunk.score > existing.score) {
+      bestByKey.set(dedupKey, chunk);
+    }
+  }
+
+  return [...bestByKey.values()].slice(0, MAX_UNIQUE_SOURCES);
 }
 
 export const resolvers = {
@@ -23,8 +48,9 @@ export const resolvers = {
       const queryEmbedding = await embedText(question);
 
       const chunks = await searchChunks(queryEmbedding, { steuerart });
+      const uniqueChunks = deduplicateBySource(chunks);
 
-      const llmChunks: LlmContextChunk[] = chunks.map((chunk) => ({
+      const llmChunks: LlmContextChunk[] = uniqueChunks.map((chunk) => ({
         text: chunk.text,
         metadata: {
           date: chunk.metadata.date,
@@ -37,7 +63,7 @@ export const resolvers = {
 
       const answer = await generateAnswer(question, llmChunks);
 
-      const sources: Source[] = chunks.map((chunk) => ({
+      const sources: Source[] = uniqueChunks.map((chunk) => ({
         title: chunk.metadata.title,
         date: chunk.metadata.date,
         gz: chunk.metadata.gz,

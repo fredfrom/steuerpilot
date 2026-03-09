@@ -14,7 +14,28 @@
 }
 
 .text {
-  white-space: pre-wrap;
   line-height: 1.7;
   color: #2d3748;
+}
+
+.text p {
+  margin-bottom: 0.75rem;
+}
+
+.text p:last-child {
+  margin-bottom: 0;
+}
+
+.text ol,
+.text ul {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.text li {
+  margin-bottom: 0.25rem;
+}
+
+.text strong {
+  font-weight: 700;
 }

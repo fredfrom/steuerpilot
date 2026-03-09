@@ -1,3 +1,4 @@
+import Markdown from 'react-markdown'
 import styles from './AnswerDisplay.module.css'
 
 interface AnswerDisplayProps {
@@ -8,7 +9,9 @@ export function AnswerDisplay({ answer }: AnswerDisplayProps) {
   return (
     <section className={styles.container}>
       <h2 className={styles.heading}>Antwort</h2>
-      <p className={styles.text}>{answer}</p>
+      <div className={styles.text}>
+        <Markdown>{answer}</Markdown>
+      </div>
     </section>
   )
 }
