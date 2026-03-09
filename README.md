@@ -59,6 +59,9 @@ cd client
 npm install
 npm run dev
 
+# Install Python dependencies (one-time)
+pip3 install -r scripts/requirements.txt
+
 # Ingest BMF-Schreiben (run once, then daily via cron)
 npm run ingest
 ```
