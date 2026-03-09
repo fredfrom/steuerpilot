@@ -21,5 +21,6 @@ bmfChunkSchema.index({ doc_id: 1, chunk_index: 1 }, { unique: true });
 
 export const BmfChunk = mongoose.model<IBmfChunkDocument>(
   "BmfChunk",
-  bmfChunkSchema
+  bmfChunkSchema,
+  "bmf_chunks"
 );

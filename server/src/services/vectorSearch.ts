@@ -1,4 +1,5 @@
 import { BmfChunk } from "../models/BmfChunk.js";
+import { VectorSearchError } from "../errors/index.js";
 import type {
   VectorSearchOptions,
   VectorSearchResult,
@@ -7,6 +8,7 @@ import type {
 /**
  * Perform a MongoDB Atlas vector search on the bmf_chunks collection.
  * Uses the "vector_index" with cosine similarity and 1024 dimensions.
+ * Filters out superseded documents automatically.
  */
 export async function searchChunks(
   queryEmbedding: number[],
@@ -14,22 +16,39 @@ export async function searchChunks(
 ): Promise<VectorSearchResult[]> {
   const { steuerart, limit = 5, numCandidates = 100 } = options;
 
-  // TODO: Build and execute $vectorSearch aggregation pipeline
-  // const filter = steuerart ? { "metadata.steuerart": steuerart } : undefined;
-  // const pipeline = [
-  //   {
-  //     $vectorSearch: {
-  //       index: "vector_index",
-  //       path: "embedding",
-  //       queryVector: queryEmbedding,
-  //       numCandidates,
-  //       limit,
-  //       ...(filter && { filter }),
-  //     },
-  //   },
-  //   { $project: { text: 1, metadata: 1, score: { $meta: "vectorSearchScore" } } },
-  // ];
-  // return BmfChunk.aggregate(pipeline);
+  // Build pre-filter for vector search
+  const filter: Record<string, unknown> = {
+    "metadata.is_superseded": { $eq: false },
+  };
+  if (steuerart) {
+    filter["metadata.steuerart"] = { $eq: steuerart };
+  }
 
-  return [];
+  const pipeline = [
+    {
+      $vectorSearch: {
+        index: "vector_index",
+        path: "embedding",
+        queryVector: queryEmbedding,
+        numCandidates,
+        limit,
+        filter,
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        text: 1,
+        metadata: 1,
+        score: { $meta: "vectorSearchScore" },
+      },
+    },
+  ];
+
+  try {
+    const results = await BmfChunk.aggregate<VectorSearchResult>(pipeline);
+    return results;
+  } catch (error: unknown) {
+    throw new VectorSearchError("Vector search aggregation failed", error);
+  }
 }
