@@ -1,95 +1,48 @@
-import { useState, type FormEvent } from "react";
-import { gql, useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from '@apollo/client/react'
+import { SEARCH_QUERY, type SearchData } from './graphql/queries'
+import { SearchForm } from './components/SearchForm'
+import { AnswerDisplay } from './components/AnswerDisplay'
+import { SourceList } from './components/SourceList'
+import { StatsBar } from './components/StatsBar'
+import { ErrorMessage } from './components/ErrorMessage'
+import { LoadingSpinner } from './components/LoadingSpinner'
+import styles from './App.module.css'
 
-const SEARCH_QUERY = gql`
-  query Search($question: String!, $steuerart: String) {
-    search(question: $question, steuerart: $steuerart) {
-      answer
-      sources {
-        title
-        date
-        gz
-        steuerart
-        bmfUrl
-        relevanceScore
-      }
-    }
-  }
-`;
-
-interface Source {
-  title: string;
-  date: string;
-  gz: string;
-  steuerart: string;
-  bmfUrl: string;
-  relevanceScore: number;
-}
-
-interface SearchData {
-  search: {
-    answer: string;
-    sources: Source[];
-  };
-}
-
-function App() {
-  const [question, setQuestion] = useState("");
+export default function App() {
   const [executeSearch, { data, loading, error }] =
-    useLazyQuery<SearchData>(SEARCH_QUERY);
+    useLazyQuery<SearchData>(SEARCH_QUERY)
 
-  const handleSearch = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    if (question.trim()) {
-      void executeSearch({ variables: { question } });
-    }
-  };
+  const handleSearch = (question: string): void => {
+    void executeSearch({ variables: { question } })
+  }
 
   return (
-    <div>
-      <h1>Steuerpilot</h1>
-      <p>Semantische Suche in BMF-Schreiben</p>
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <h1 className={styles.title}>Steuerpilot</h1>
+        <p className={styles.subtitle}>Semantische Suche in BMF-Schreiben</p>
+      </header>
 
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Stellen Sie Ihre Frage zum Steuerrecht..."
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Suche..." : "Suchen"}
-        </button>
-      </form>
+      <div className={styles.statsSection}>
+        <StatsBar />
+      </div>
 
-      <div>
-        {error && <p>Fehler: {error.message}</p>}
+      <div className={styles.searchSection}>
+        <SearchForm onSearch={handleSearch} loading={loading} />
+      </div>
+
+      <div className={styles.results}>
+        {loading && <LoadingSpinner />}
+
+        {error && <ErrorMessage message={error.message} />}
 
         {data?.search && (
-          <div>
-            <h2>Antwort</h2>
-            <p>{data.search.answer}</p>
-
-            {data.search.sources.length > 0 && (
-              <div>
-                <h3>Quellen</h3>
-                <ul>
-                  {data.search.sources.map((source, i) => (
-                    <li key={i}>
-                      <a href={source.bmfUrl} target="_blank" rel="noreferrer">
-                        {source.title}
-                      </a>{" "}
-                      — {source.date} ({source.steuerart})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+          <>
+            <AnswerDisplay answer={data.search.answer} />
+            <SourceList sources={data.search.sources} />
+          </>
         )}
       </div>
     </div>
-  );
+  )
 }
-
-export default App;

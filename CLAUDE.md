@@ -28,6 +28,11 @@ node scripts/ingest.js
 # Lint
 cd server && npm run lint
 cd client && npm run lint
+
+# Bulk ingestion (one-off local Python script)
+# Uses sentence-transformers for embeddings (CPU). Never called by the application.
+pip install sentence-transformers pymongo requests beautifulsoup4 pdfplumber python-dotenv
+python scripts/ingest_bulk_local.py [--dry-run] [--limit N]
 ```
 
 ---

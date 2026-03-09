@@ -1,0 +1,20 @@
+.container {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.heading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a365d;
+  margin-bottom: 0.75rem;
+}
+
+.text {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: #2d3748;
+}
