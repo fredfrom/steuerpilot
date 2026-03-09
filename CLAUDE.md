@@ -12,7 +12,7 @@ cd server && npm install
 cd client && npm install
 
 # Dev
-cd server && npm run dev        # nodemon, port 4000
+cd server && npm run dev        # tsx, port 4000
 cd client && npm run dev        # vite, port 5173
 
 # Tests (must pass before any commit)

@@ -5,7 +5,7 @@
   "type": "module",
   "main": "ingest.ts",
   "scripts": {
-    "ingest": "ts-node --esm ingest.ts",
+    "ingest": "tsx ingest.ts",
     "test": "jest --forceExit"
   },
   "keywords": [],
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.3.5",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
