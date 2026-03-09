@@ -5,22 +5,23 @@ import { expressMiddleware } from "@as-integrations/express5";
 import request from "supertest";
 import { typeDefs } from "../schema/typeDefs.js";
 import { resolvers } from "../resolvers/index.js";
+import type { ApolloContext } from "../types/context.types.js";
 
 describe("GraphQL resolvers", () => {
-  let app;
-  let httpServer;
-  let server;
+  let app: ReturnType<typeof express>;
+  let httpServer: http.Server;
+  let server: ApolloServer<ApolloContext>;
 
   beforeAll(async () => {
     app = express();
     httpServer = http.createServer(app);
-    server = new ApolloServer({ typeDefs, resolvers });
+    server = new ApolloServer<ApolloContext>({ typeDefs, resolvers });
     await server.start();
     app.use(
       "/graphql",
       express.json(),
       expressMiddleware(server, {
-        context: async ({ req }) => ({ req }),
+        context: async ({ req }): Promise<ApolloContext> => ({ req }),
       })
     );
   });

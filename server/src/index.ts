@@ -8,13 +8,14 @@ import dotenv from "dotenv";
 import { typeDefs } from "./schema/typeDefs.js";
 import { resolvers } from "./resolvers/index.js";
 import { connectDB } from "./config/db.js";
+import type { ApolloContext } from "./types/context.types.js";
 
 dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);
 
-const server = new ApolloServer({
+const server = new ApolloServer<ApolloContext>({
   typeDefs,
   resolvers,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
@@ -27,15 +28,14 @@ app.use(
   cors(),
   express.json(),
   expressMiddleware(server, {
-    context: async ({ req }) => ({ req }),
+    context: async ({ req }): Promise<ApolloContext> => ({ req }),
   })
 );
 
 await connectDB();
 
-await new Promise((resolve) =>
-  httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+const PORT = process.env.PORT ?? 4000;
+await new Promise<void>((resolve) =>
+  httpServer.listen({ port: PORT }, resolve)
 );
-console.log(
-  `🚀 Server ready at http://localhost:${process.env.PORT || 4000}/graphql`
-);
+console.log(`🚀 Server ready at http://localhost:${String(PORT)}/graphql`);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 
 const SEARCH_QUERY = gql`
@@ -17,14 +17,31 @@ const SEARCH_QUERY = gql`
   }
 `;
 
+interface Source {
+  title: string;
+  date: string;
+  gz: string;
+  steuerart: string;
+  bmfUrl: string;
+  relevanceScore: number;
+}
+
+interface SearchData {
+  search: {
+    answer: string;
+    sources: Source[];
+  };
+}
+
 function App() {
   const [question, setQuestion] = useState("");
-  const [executeSearch, { data, loading, error }] = useLazyQuery(SEARCH_QUERY);
+  const [executeSearch, { data, loading, error }] =
+    useLazyQuery<SearchData>(SEARCH_QUERY);
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (question.trim()) {
-      executeSearch({ variables: { question } });
+      void executeSearch({ variables: { question } });
     }
   };
 

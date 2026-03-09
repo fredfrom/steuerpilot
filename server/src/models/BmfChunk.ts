@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import type { IBmfChunkDocument } from "../types/chunk.types.js";
 
-const bmfChunkSchema = new mongoose.Schema({
+const bmfChunkSchema = new mongoose.Schema<IBmfChunkDocument>({
   doc_id: { type: String, required: true, index: true },
   chunk_index: { type: Number, required: true },
   text: { type: String, required: true },
@@ -18,4 +19,7 @@ const bmfChunkSchema = new mongoose.Schema({
 
 bmfChunkSchema.index({ doc_id: 1, chunk_index: 1 }, { unique: true });
 
-export const BmfChunk = mongoose.model("BmfChunk", bmfChunkSchema);
+export const BmfChunk = mongoose.model<IBmfChunkDocument>(
+  "BmfChunk",
+  bmfChunkSchema
+);

@@ -6,14 +6,35 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
 dotenv.config({ path: "../.env" });
 
+interface BmfListingEntry {
+  url: string;
+  title: string;
+  date: string;
+  steuerart: string;
+}
+
+interface BmfDocumentMetadata {
+  date: string;
+  gz: string;
+  steuerart: string;
+  title: string;
+  bmf_url: string;
+  paragraphen: string[];
+}
+
+interface UpsertResult {
+  inserted: number;
+  skipped: number;
+}
+
+const EMBEDDING_DIMENSIONS = 1024;
+
 /**
  * Scrape the BMF listing page to collect all available BMF-Schreiben.
  * Fetches the HTML listing from bundesfinanzministerium.de and parses it
  * to extract PDF URLs, titles, publication dates, and Steuerart categories.
- *
- * @returns {Promise<Array<{url: string, title: string, date: string, steuerart: string}>>}
  */
-export async function scrapeBmfListingPage() {
+export async function scrapeBmfListingPage(): Promise<BmfListingEntry[]> {
   // TODO: Fetch BMF listing page HTML
   // TODO: Parse HTML to extract PDF links, titles, dates, and Steuerart
   // TODO: Respect 180s crawl delay from robots.txt
@@ -24,11 +45,8 @@ export async function scrapeBmfListingPage() {
  * Fetch a PDF from the given URL into memory and extract its text content.
  * The PDF is never written to disk — it is processed entirely in memory.
  * Uses pdf-parse for UTF-8 text extraction with German umlaut support.
- *
- * @param {string} url - The URL of the PDF to fetch
- * @returns {Promise<string>} Extracted text content of the PDF
  */
-export async function fetchAndParsePdf(url) {
+export async function fetchAndParsePdf(url: string): Promise<string> {
   // TODO: Fetch PDF via axios with responseType: "arraybuffer"
   // TODO: Parse with pdf-parse and return text
   return "";
@@ -41,11 +59,8 @@ export async function fetchAndParsePdf(url) {
  * - chunkSize: 512 tokens
  * - overlap: 50 tokens
  * - separators: ["\n\n", "\nRz.", "\n§", "\n1.", "\n2.", "\n"]
- *
- * @param {string} text - The full text to split
- * @returns {Promise<string[]>} Array of text chunks
  */
-export async function chunkText(text) {
+export async function chunkText(text: string): Promise<string[]> {
   // TODO: Initialize RecursiveCharacterTextSplitter with config from ARCHITECTURE.md
   // const splitter = new RecursiveCharacterTextSplitter({
   //   chunkSize: 512,
@@ -59,12 +74,11 @@ export async function chunkText(text) {
 /**
  * Extract structured metadata from the PDF text and URL.
  * Parses: publication date, GZ (Aktenzeichen), Steuerart, and §-references.
- *
- * @param {string} text - The extracted PDF text
- * @param {string} url - The original BMF URL (used to derive doc_id and Steuerart)
- * @returns {{date: string, gz: string, steuerart: string, title: string, bmf_url: string, paragraphen: string[]}}
  */
-export function extractMetadata(text, url) {
+export function extractMetadata(
+  text: string,
+  url: string
+): BmfDocumentMetadata {
   // TODO: Parse date from URL pattern YYYY-MM-DD
   // TODO: Extract GZ (e.g., "IV C 1 - S 2256/19/10003") from text
   // TODO: Derive Steuerart from URL path
@@ -74,7 +88,7 @@ export function extractMetadata(text, url) {
     gz: "",
     steuerart: "",
     title: "",
-    bmf_url: url || "",
+    bmf_url: url,
     paragraphen: [],
   };
 }
@@ -82,28 +96,26 @@ export function extractMetadata(text, url) {
 /**
  * Embed an array of text chunks using the HuggingFace Inference API.
  * Model: mixedbread-ai/deepset-mxbai-embed-de-large-v1 (1024 dimensions).
- *
- * @param {string[]} chunks - Array of text chunks to embed
- * @returns {Promise<number[][]>} Array of 1024-dimensional float arrays
  */
-export async function embedChunks(chunks) {
+export async function embedChunks(chunks: string[]): Promise<number[][]> {
   // TODO: Call HuggingFace Inference API with batch input
   // POST https://router.huggingface.co/hf-inference/models/mixedbread-ai/deepset-mxbai-embed-de-large-v1/pipeline/feature-extraction
   // Headers: { Authorization: `Bearer ${process.env.HUGGINGFACE_API_KEY}` }
-  return chunks.map(() => new Array(1024).fill(0));
+  return chunks.map(
+    () => new Array(EMBEDDING_DIMENSIONS).fill(0) as number[]
+  );
 }
 
 /**
  * Upsert chunk documents with embeddings and metadata into MongoDB Atlas.
  * Uses doc_id + chunk_index as a composite unique key to skip already-indexed documents.
  * No PDF bytes are stored — only vectors, text chunks, and metadata.
- *
- * @param {string[]} chunks - Array of text chunks
- * @param {number[][]} embeddings - Corresponding embedding vectors
- * @param {object} metadata - Shared metadata for all chunks from this document
- * @returns {Promise<{inserted: number, skipped: number}>}
  */
-export async function upsertToMongodb(chunks, embeddings, metadata) {
+export async function upsertToMongodb(
+  chunks: string[],
+  embeddings: number[][],
+  metadata: BmfDocumentMetadata
+): Promise<UpsertResult> {
   // TODO: Build bulk upsert operations using doc_id + chunk_index
   // TODO: Use BmfChunk.bulkWrite with updateOne + upsert: true
   return { inserted: 0, skipped: 0 };
@@ -118,7 +130,7 @@ export async function upsertToMongodb(chunks, embeddings, metadata) {
  * Called by node-cron on the schedule defined in CRON_SCHEDULE env var,
  * or directly via `node ingest.js`.
  */
-export async function runIngestion() {
+export async function runIngestion(): Promise<void> {
   // TODO: Connect to MongoDB
   // TODO: Scrape listing page
   // TODO: Filter out already-indexed documents
@@ -128,7 +140,7 @@ export async function runIngestion() {
 }
 
 // Run directly if called as a script
-const isMain = process.argv[1]?.includes("ingest.js");
+const isMain = process.argv[1]?.includes("ingest");
 if (isMain) {
   runIngestion().catch(console.error);
 }

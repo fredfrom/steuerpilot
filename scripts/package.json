@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Steuerpilot ingestion pipeline scripts",
   "type": "module",
-  "main": "ingest.js",
+  "main": "ingest.ts",
   "scripts": {
-    "ingest": "node ingest.js",
+    "ingest": "ts-node --esm ingest.ts",
     "test": "jest --forceExit"
   },
   "keywords": [],
@@ -16,5 +16,10 @@
     "dotenv": "^17.3.1",
     "mongoose": "^9.2.4",
     "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

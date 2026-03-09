@@ -53,7 +53,7 @@ cd client && npm run lint
 - ES modules throughout (import/export, not require)
 - async/await — no raw Promise chains
 - Named exports — no default exports except React components
-- No TypeScript (plain JS with JSDoc where helpful)
+- TypeScript throughout, strict mode, no any
 - Error messages in English, UI strings in German
 - No console.log in production paths — use console.error for actual errors only
 
@@ -66,6 +66,204 @@ cd client && npm run lint
 - Tests use Jest + Supertest (server) and Vitest (client)
 - New modules ship with at least it.todo() stubs so coverage gaps are visible
 - No mocking of the actual MongoDB vector search in integration tests — use a real Atlas M0 connection with a test collection
+
+---
+
+## Code Quality Standards
+
+Apply these standards to all new code without being asked.
+
+### TDD Workflow
+Follow red-green-refactor:
+1. Write a failing test that describes the behaviour
+2. Write the minimum code to make it pass
+3. Refactor — clean up without changing behaviour
+
+Write tests before or alongside logic — never after the fact.
+Boilerplate and scaffolding are exceptions. Any function containing
+real business logic must have a test written before or during implementation,
+not retrospectively.
+
+### Clean Code Rules
+- Functions do one thing — if you need "and" to describe it, split it
+- Max function length: ~20 lines. If longer, extract
+- Name variables and functions for what they mean, not what they are
+  - BAD: data, result, temp, item, obj
+  - GOOD: bmfChunk, embeddingVector, ingestResult
+- No magic numbers or strings — use named constants
+- Fail fast and explicitly — validate inputs at function entry, throw meaningful errors
+
+### AI-First Workflow Discipline
+- Use AI for: scaffolding, refactoring, test generation, boilerplate, debugging
+- Always verify AI-generated logic with tests before moving on
+- When a function is generated, write or generate a test for it immediately
+- Document non-obvious decisions with a one-line comment explaining WHY, not WHAT
+
+---
+
+## TypeScript Standards
+
+The entire codebase is TypeScript with strict mode enabled.
+These rules are non-negotiable.
+
+### Strict Mode Requirements
+tsconfig.json enables:
+- strict: true (covers noImplicitAny, strictNullChecks, strictFunctionTypes etc.)
+- noUncheckedIndexedAccess: true
+- noImplicitReturns: true
+- noFallthroughCasesInSwitch: true
+- skipLibCheck: true
+// skipLibCheck skips vendor .d.ts files only — your own code remains fully type-checked.
+// Acceptable for known vendor type bugs. Never use to hide errors in our own source files.
+
+### Forbidden Patterns — Never Do These
+```typescript
+// FORBIDDEN: any type
+const data: any = response
+
+// FORBIDDEN: type assertion to bypass errors
+const user = response as User
+
+// FORBIDDEN: non-null assertion without genuine certainty
+const name = user!.name
+
+// FORBIDDEN: @ts-ignore or @ts-expect-error to silence errors
+// @ts-ignore
+doSomethingBroken()
+
+// FORBIDDEN: implicit any in function parameters
+function process(data) { ... }
+
+// FORBIDDEN: empty catch that swallows errors
+try {
+  await riskyCall()
+} catch (e) {}
+```
+
+### Required Patterns
+```typescript
+// CORRECT: explicit types on function signatures
+async function fetchChunks(docId: string): Promise<BmfChunk[]> { ... }
+
+// CORRECT: use unknown instead of any for external data
+const response: unknown = await fetch(url)
+
+// CORRECT: narrow unknown with type guards
+function isBmfChunk(value: unknown): value is BmfChunk {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'doc_id' in value &&
+    'text' in value
+  )
+}
+
+// CORRECT: handle null/undefined explicitly
+const chunk = chunks[0]
+if (!chunk) throw new Error('No chunks returned for document')
+
+// CORRECT: catch with unknown, narrow before using
+try {
+  await riskyCall()
+} catch (error: unknown) {
+  if (error instanceof Error) {
+    console.error(error.message)
+  }
+  throw error
+}
+```
+
+### Type Definitions
+- Define shared types in server/src/types/ directory
+- One file per domain: chunk.types.ts, search.types.ts, llm.types.ts
+- Export all types as named exports
+- Mongoose documents get their own interface extending Document:
+```typescript
+import { Document } from 'mongoose'
+
+export interface IBmfChunk {
+  doc_id: string
+  chunk_index: number
+  text: string
+  embedding: number[]
+  metadata: {
+    date: string
+    gz: string
+    steuerart: string
+    title: string
+    bmf_url: string
+    paragraphen: string[]
+    is_superseded: boolean
+  }
+}
+
+export interface IBmfChunkDocument extends IBmfChunk, Document {}
+```
+
+### GraphQL + TypeScript
+- Never type resolver return values as any
+- Use generated types if possible, otherwise define resolver types explicitly
+- Context type must be defined and used consistently:
+```typescript
+export interface ApolloContext {
+  req: Request
+}
+```
+
+### When You Hit a Type Error
+1. Read the error message fully — it usually tells you exactly what is wrong
+2. Fix the underlying issue — wrong type, missing null check, incorrect assumption
+3. If genuinely stuck, use unknown + type guard, never any
+4. Never use type assertions (as Type) unless you have verified the shape at runtime first
+5. If a third-party library has no types: install @types/library — if none exist,
+   write a minimal .d.ts declaration file in src/types/vendor/
+
+---
+
+## Stack-Specific Rules
+
+### MongoDB / Mongoose
+- Always define indexes in the Mongoose schema — schema is the source of truth, never create indexes manually in Atlas UI
+- Vector search indexes are the exception — they must be created via Atlas UI or Atlas API, Mongoose cannot create them. Document this wherever vector search is configured.
+- Never use findOne or find without a lean() call when you don't need Mongoose document methods — returns plain objects and is significantly faster
+- Always handle the case where findOne returns null explicitly — never assume a document exists
+- Never store raw user input directly — validate and sanitize at the service layer
+
+### GraphQL / Apollo
+- Resolvers must be thin — no business logic directly in a resolver
+- Extract all logic to service functions in server/src/services/ that can be unit tested independently of GraphQL
+- Never return raw Mongoose documents from resolvers — always call .toObject() or map to a plain object
+- Always define explicit return types on resolvers matching the GraphQL schema
+
+### RAG Pipeline
+- Embedding calls to HuggingFace must always have a timeout and explicit error handling
+- Never call the embedding service inside a resolver — embeddings are generated at ingest time only, not at query time
+- LLM responses are non-deterministic — tests for LLM output must assert structure and presence only, never exact string content
+- Always validate that embedding dimensions match (1024) before storing — a dimension mismatch silently breaks vector search
+
+### Async Patterns
+- Never use await inside a for loop unless serialization is explicitly required (e.g. respecting crawl delay in ingestion)
+- Use Promise.all() for parallel async operations
+- Always handle Promise.all() failures — if one fails, decide explicitly whether to fail fast or continue with partial results
+
+### Error Handling
+- All service functions must throw typed errors, not generic Error objects
+- Define custom error classes in server/src/errors/:
+```typescript
+export class EmbeddingError extends Error {
+  constructor(message: string, public readonly cause?: unknown) {
+    super(message)
+    this.name = 'EmbeddingError'
+  }
+}
+
+export class VectorSearchError extends Error {
+  constructor(message: string, public readonly cause?: unknown) {
+    super(message)
+    this.name = 'VectorSearchError'
+  }
+}
+```
 
 ---
 
