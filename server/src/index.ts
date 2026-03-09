@@ -36,6 +36,7 @@ for (const envVar of REQUIRED_ENV_VARS) {
 }
 
 const app = express();
+app.set('trust proxy', 1);
 const httpServer = http.createServer(app);
 
 // Security headers
