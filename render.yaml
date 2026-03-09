@@ -17,3 +17,7 @@ services:
         sync: false
       - key: PORT
         value: 10000
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: CRON_SCHEDULE
+        sync: false

@@ -1,8 +1,9 @@
 import { Mistral } from "@mistralai/mistralai";
 import axios from "axios";
 import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const { PDFParse } = require("pdf-parse") as {
+// Rename to avoid clash with CJS `require` global in test environments
+const esmRequire = createRequire(import.meta.url);
+const { PDFParse } = esmRequire("pdf-parse") as {
   PDFParse: new (opts: { data: Uint8Array }) => {
     load: () => Promise<void>;
     getText: () => Promise<{ text: string; pages: unknown; total: number }>;

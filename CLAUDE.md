@@ -415,3 +415,5 @@ Required:
 - MISTRAL_API_KEY
 - GROQ_API_KEY
 - PORT (default: 4000)
+- ALLOWED_ORIGINS — comma-separated CORS origins (default: http://localhost:5173)
+- CRON_SCHEDULE — cron expression for RSS ingestion (default: "0 6 * * *", or "disabled")

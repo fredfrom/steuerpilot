@@ -45,7 +45,8 @@ export function SearchForm({
           value={question}
           onChange={(event) => setQuestion(event.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Stellen Sie Ihre Frage zum Steuerrecht..."
+          placeholder="Stellen Sie Fragen zu BMF-Schreiben und Verwaltungsanweisungen des Bundesfinanzministeriums …"
+          aria-label="Suchanfrage zum deutschen Steuerrecht"
           disabled={loading}
           rows={2}
         />
@@ -56,6 +57,7 @@ export function SearchForm({
                 key={cat.steuerart}
                 type="button"
                 className={`${styles.pill} ${selectedSteuerart === cat.steuerart ? styles.pillActive : ''}`}
+                aria-pressed={selectedSteuerart === cat.steuerart}
                 onClick={() =>
                   onSteuerartChange(
                     selectedSteuerart === cat.steuerart ? '' : cat.steuerart

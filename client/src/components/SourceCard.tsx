@@ -26,7 +26,7 @@ export function SourceCard({ source }: SourceCardProps) {
     >
       <div className={styles.headerRow}>
         <div className={styles.title}>{source.title}</div>
-        <span className={styles.linkIcon}>↗</span>
+        <span className={styles.linkIcon} aria-hidden="true">↗</span>
       </div>
       {source.tldr && <div className={styles.tldr}>{source.tldr}</div>}
       <div className={styles.meta}>

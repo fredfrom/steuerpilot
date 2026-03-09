@@ -102,3 +102,14 @@ Automatische Klassifizierung nach populären Steuer-Themen (Homeoffice, Dienstwa
 ### N11 · "Mehr laden"
 
 Pagination der Suchergebnisse wenn Nutzerdaten zeigen dass mehr als 5 Quellen gewünscht werden.
+
+## Planned Features
+
+### N12 — BFH-Urteile Integration
+Extend the ingestion pipeline to cover rulings from the Bundesfinanzhof (BFH).
+- Source: https://www.bundesfinanzhof.de/de/entscheidung/entscheidungen-online/
+- Same audience as BMF-Schreiben (Steuerberater, Wirtschaftsprüfer)
+- Directly complementary: BMF-Schreiben state the administration's position, BFH-Urteile show where courts have ruled differently
+- Requires: separate ingest script, BFH-specific chunking strategy (Leitsatz + Gründe), extended GraphQL schema with `source` field distinguishing BMF vs BFH results
+- Filter pill in UI: "BMF-Schreiben" | "BFH-Urteile" | "Alle"
+- Priority: post-launch, after real usage data confirms demand

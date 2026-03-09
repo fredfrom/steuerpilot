@@ -20,6 +20,21 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
+// ── Env var validation (fail fast at startup) ───────────────────────────
+const REQUIRED_ENV_VARS = [
+  "MONGODB_URI",
+  "HUGGINGFACE_API_KEY",
+  "MISTRAL_API_KEY",
+  "GROQ_API_KEY",
+] as const;
+
+for (const envVar of REQUIRED_ENV_VARS) {
+  if (!process.env[envVar]) {
+    console.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
+
 const app = express();
 const httpServer = http.createServer(app);
 
@@ -45,10 +60,13 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
   : ["http://localhost:5173"];
 
-// Rate limiting — 20 requests per minute per IP
+// Rate limiting
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 20;
+
 const graphqlLimiter = rateLimit({
-  windowMs: 60_000,
-  limit: 20,
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  limit: RATE_LIMIT_MAX_REQUESTS,
   standardHeaders: "draft-6",
   legacyHeaders: false,
   message: {
@@ -95,7 +113,8 @@ if (cronSchedule !== "disabled") {
   console.error(`[cron] Scheduled RSS ingestion: ${cronSchedule}`);
 }
 
-const PORT = process.env.PORT ?? 4000;
+const DEFAULT_PORT = 4000;
+const PORT = process.env.PORT ?? DEFAULT_PORT;
 await new Promise<void>((resolve) =>
   httpServer.listen({ port: PORT }, resolve)
 );
