@@ -1,32 +1,24 @@
 #!/usr/bin/env python3
-# Disable MPS and all parallelism before any PyTorch/tokenizer imports
-import os
-os.environ['TOKENIZERS_PARALLELISM'] = 'false'
-os.environ['OMP_NUM_THREADS'] = '1'
-os.environ['MKL_NUM_THREADS'] = '1'
-os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '0'
-os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
-
 """
 ingest_bulk_local.py — One-off local bulk ingestion of all historical BMF-Schreiben.
 
 Crawls all 51 pages of the BMF publications listing, downloads PDFs in-memory,
-chunks text, generates embeddings using sentence-transformers (CPU), and upserts
+chunks text, generates embeddings via HuggingFace Inference API, and upserts
 to MongoDB Atlas.
 
 This script is never called by the Node.js application. It exists only for initial
 seeding of the bmf_chunks collection.
 
 Dependencies:
-    pip install sentence-transformers pymongo requests beautifulsoup4 pdfplumber python-dotenv
+    pip install pymongo requests beautifulsoup4 pdfplumber python-dotenv
 
 Usage:
     python scripts/ingest_bulk_local.py [--dry-run] [--limit N]
 """
 
 import argparse
-import gc
 import io
+import os
 import re
 import sys
 import time
@@ -54,10 +46,11 @@ CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 EMBEDDING_DIMENSIONS = 1024
 EMBEDDING_MODEL_NAME = "mixedbread-ai/deepset-mxbai-embed-de-large-v1"
+ONNX_MODEL_FILE = "onnx/model.onnx"
 # The mxbai model requires a prefix for document passages
 PASSAGE_PREFIX = "passage: "
 
-EMBED_BATCH_SIZE = 4
+EMBED_BATCH_SIZE = 16
 COLLECTION_NAME = "bmf_chunks"
 REQUEST_TIMEOUT = 60
 
@@ -474,12 +467,17 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
         print("=" * 60)
         return
 
-    # Phase 2: Load embedding model
-    print("\nLoading embedding model (this may take a few minutes on first run)...")
-    from sentence_transformers import SentenceTransformer
+    # Phase 2: Load ONNX model (bypasses broken PyTorch MKL BLAS on macOS)
+    print("\nLoading embedding model via ONNX Runtime...")
+    import numpy as np
+    import onnxruntime as ort
+    from huggingface_hub import hf_hub_download
+    from transformers import AutoTokenizer
 
-    model = SentenceTransformer(EMBEDDING_MODEL_NAME, device="cpu")
-    print(f"  Model loaded: {EMBEDDING_MODEL_NAME}")
+    onnx_path = hf_hub_download(EMBEDDING_MODEL_NAME, ONNX_MODEL_FILE)
+    ort_session = ort.InferenceSession(onnx_path, providers=["CPUExecutionProvider"])
+    tokenizer = AutoTokenizer.from_pretrained(EMBEDDING_MODEL_NAME)
+    print(f"  Model loaded: {EMBEDDING_MODEL_NAME} (ONNX)")
 
     # Phase 3: Connect to MongoDB
     client: pymongo.MongoClient[dict[str, object]] = pymongo.MongoClient(mongodb_uri)
@@ -522,18 +520,29 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
                 continue
             print(f"  Created {len(chunks)} chunks")
 
-            # Generate embeddings with passage: prefix (batched to avoid OOM on large docs)
+            # Generate embeddings via ONNX Runtime (local, no PyTorch inference)
             prefixed_chunks = [PASSAGE_PREFIX + c for c in chunks]
             embedding_list: list[list[float]] = []
             total_batches = (len(prefixed_chunks) + EMBED_BATCH_SIZE - 1) // EMBED_BATCH_SIZE
+            print(f"  Embedding {len(prefixed_chunks)} chunks in {total_batches} batches...", flush=True)
             for batch_idx, batch_start in enumerate(range(0, len(prefixed_chunks), EMBED_BATCH_SIZE)):
                 batch = prefixed_chunks[batch_start:batch_start + EMBED_BATCH_SIZE]
-                batch_embeddings = model.encode(batch, show_progress_bar=False, num_workers=0)
-                embedding_list.extend(batch_embeddings.tolist())
-                del batch_embeddings
-                gc.collect()
-                if total_batches > 5 and (batch_idx + 1) % 5 == 0:
-                    print(f"    Embedded batch {batch_idx + 1}/{total_batches}")
+                encoded = tokenizer(
+                    batch, padding=True, truncation=True, max_length=512, return_tensors="np",
+                )
+                outputs = ort_session.run(None, {
+                    "input_ids": encoded["input_ids"].astype(np.int64),
+                    "attention_mask": encoded["attention_mask"].astype(np.int64),
+                })
+                # Mean pooling + L2 normalize
+                hidden = outputs[0]
+                mask = encoded["attention_mask"][:, :, np.newaxis]
+                pooled = (hidden * mask).sum(axis=1) / mask.sum(axis=1)
+                norms = np.linalg.norm(pooled, axis=1, keepdims=True)
+                normalized = pooled / norms
+                embedding_list.extend(normalized.tolist())
+                if total_batches > 2 and (batch_idx + 1) % 2 == 0:
+                    print(f"    Batch {batch_idx + 1}/{total_batches}", flush=True)
 
             # Validate dimensions
             for emb in embedding_list:

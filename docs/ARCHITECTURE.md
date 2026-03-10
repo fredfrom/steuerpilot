@@ -44,7 +44,7 @@ Two distinct ingestion paths serve different purposes:
 | Script | `scripts/ingest_bulk_local.py` |
 | Runs on | Developer machine (local, never on server) |
 | Scope | All 51 listing pages on bundesfinanzministerium.de (~509 documents) |
-| Embeddings | Local sentence-transformers (CPU) — avoids HuggingFace API costs for large batch |
+| Embeddings | HuggingFace Inference API (same model as daily ingestion) |
 | Idempotent | Upserts on `{doc_id, chunk_index}` — safe to re-run |
 | Command | `python3 scripts/ingest_bulk_local.py [--dry-run] [--limit N]` |
 
@@ -53,7 +53,7 @@ Two distinct ingestion paths serve different purposes:
 2. For each document: check MongoDB (already ingested?) → skip if yes
 3. Fetch PDF into memory → extract text with pdfplumber
 4. Chunk: recursive split (1000 chars, 200 overlap, German legal separators)
-5. Embed locally: mxbai-embed-de-large-v1 via sentence-transformers (1024 dims)
+5. Embed: mxbai-embed-de-large-v1 via HuggingFace Inference API (1024 dims)
 6. Upsert chunks + metadata into MongoDB Atlas
 7. Buffer garbage-collected — no PDF bytes remain on disk or in memory
 ```

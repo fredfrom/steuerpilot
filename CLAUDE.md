@@ -23,7 +23,7 @@ cd scripts && npm test          # jest
 node scripts/dsgvo-check.js
 
 # Bulk backfill (one-time, runs locally on developer machine)
-# Crawls all 51 BMF listing pages, embeds locally via sentence-transformers (CPU).
+# Crawls all 51 BMF listing pages, embeds via HuggingFace Inference API.
 # Idempotent — upserts on {doc_id, chunk_index}, safe to re-run.
 pip3 install -r scripts/requirements.txt
 python3 scripts/ingest_bulk_local.py [--dry-run] [--limit N]
