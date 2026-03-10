@@ -1,0 +1,81 @@
+"filename", "language", "YAML", "Markdown", "JSON", "PostCSS", "TypeScript JSX", "XML", "TypeScript", "JavaScript", "JSON with Comments", "HTML", "Python", "pip requirements", "comment", "blank", "total"
+"/Users/friedemannfrommelt/steuerpilot/CLAUDE.md", "Markdown", 0, 326, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 94, 423
+"/Users/friedemannfrommelt/steuerpilot/README.md", "Markdown", 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 87
+"/Users/friedemannfrommelt/steuerpilot/client/README.md", "Markdown", 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 17
+"/Users/friedemannfrommelt/steuerpilot/client/eslint.config.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 28, 0, 0, 0, 0, 0, 2, 30
+"/Users/friedemannfrommelt/steuerpilot/client/index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 1, 14
+"/Users/friedemannfrommelt/steuerpilot/client/package-lock.json", "JSON", 0, 0, 4335, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4336
+"/Users/friedemannfrommelt/steuerpilot/client/package.json", "JSON", 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 35
+"/Users/friedemannfrommelt/steuerpilot/client/public/sitemap.xml", "XML", 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1, 9
+"/Users/friedemannfrommelt/steuerpilot/client/public/vite.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"/Users/friedemannfrommelt/steuerpilot/client/src/App.module.css", "PostCSS", 0, 0, 0, 115, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 137
+"/Users/friedemannfrommelt/steuerpilot/client/src/App.tsx", "TypeScript JSX", 0, 0, 0, 0, 139, 0, 0, 0, 0, 0, 0, 0, 0, 17, 156
+"/Users/friedemannfrommelt/steuerpilot/client/src/assets/react.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/AnswerDisplay.module.css", "PostCSS", 0, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 75
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/AnswerDisplay.tsx", "TypeScript JSX", 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 3, 29
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/ErrorMessage.module.css", "PostCSS", 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 14
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/ErrorMessage.tsx", "TypeScript JSX", 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/FaqSection.module.css", "PostCSS", 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 69
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/FaqSection.tsx", "TypeScript JSX", 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 0, 0, 5, 71
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/Footer.module.css", "PostCSS", 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 44
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/Footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 2, 24
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/Header.module.css", "PostCSS", 0, 0, 0, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 43
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/Header.tsx", "TypeScript JSX", 0, 0, 0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0, 4, 30
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/LoadingSpinner.module.css", "PostCSS", 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 28
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/LoadingSpinner.tsx", "TypeScript JSX", 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/SearchForm.module.css", "PostCSS", 0, 0, 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 106
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/SearchForm.tsx", "TypeScript JSX", 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 7, 83
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/SourceCard.module.css", "PostCSS", 0, 0, 0, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 98
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/SourceCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 52, 0, 0, 0, 0, 0, 0, 0, 0, 4, 56
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/SourceList.module.css", "PostCSS", 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 24
+"/Users/friedemannfrommelt/steuerpilot/client/src/components/SourceList.tsx", "TypeScript JSX", 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 4, 23
+"/Users/friedemannfrommelt/steuerpilot/client/src/graphql/queries.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 7, 62
+"/Users/friedemannfrommelt/steuerpilot/client/src/index.css", "PostCSS", 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 36
+"/Users/friedemannfrommelt/steuerpilot/client/src/main.tsx", "TypeScript JSX", 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 6, 44
+"/Users/friedemannfrommelt/steuerpilot/client/src/pages/Datenschutz.tsx", "TypeScript JSX", 0, 0, 0, 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 11, 120
+"/Users/friedemannfrommelt/steuerpilot/client/src/pages/Impressum.tsx", "TypeScript JSX", 0, 0, 0, 0, 61, 0, 0, 0, 0, 0, 0, 0, 0, 11, 72
+"/Users/friedemannfrommelt/steuerpilot/client/src/pages/LegalPage.module.css", "PostCSS", 0, 0, 0, 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 81
+"/Users/friedemannfrommelt/steuerpilot/client/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 1, 15
+"/Users/friedemannfrommelt/steuerpilot/client/vercel.json", "JSON", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"/Users/friedemannfrommelt/steuerpilot/client/vite.config.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 1, 2, 8
+"/Users/friedemannfrommelt/steuerpilot/docs/ARCHITECTURE.md", "Markdown", 0, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 44, 244
+"/Users/friedemannfrommelt/steuerpilot/docs/LEGAL.md", "Markdown", 0, 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 38, 100
+"/Users/friedemannfrommelt/steuerpilot/docs/ROADMAP.md", "Markdown", 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 116
+"/Users/friedemannfrommelt/steuerpilot/package-lock.json", "JSON", 0, 0, 165, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 166
+"/Users/friedemannfrommelt/steuerpilot/package.json", "JSON", 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13
+"/Users/friedemannfrommelt/steuerpilot/render.yaml", "YAML", 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24
+"/Users/friedemannfrommelt/steuerpilot/scripts/__tests__/ingest.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 231, 0, 0, 0, 0, 0, 10, 54, 295
+"/Users/friedemannfrommelt/steuerpilot/scripts/dsgvo-check.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 164, 0, 0, 0, 0, 14, 21, 199
+"/Users/friedemannfrommelt/steuerpilot/scripts/ingest.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 374, 0, 0, 0, 0, 0, 80, 71, 525
+"/Users/friedemannfrommelt/steuerpilot/scripts/ingest_bulk_local.py", "Python", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 419, 0, 76, 115, 610
+"/Users/friedemannfrommelt/steuerpilot/scripts/jest.config.cjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 2, 1, 20
+"/Users/friedemannfrommelt/steuerpilot/scripts/package-lock.json", "JSON", 0, 0, 6816, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6817
+"/Users/friedemannfrommelt/steuerpilot/scripts/package.json", "JSON", 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 31
+"/Users/friedemannfrommelt/steuerpilot/scripts/requirements.txt", "pip requirements", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 7
+"/Users/friedemannfrommelt/steuerpilot/scripts/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 4, 1, 22
+"/Users/friedemannfrommelt/steuerpilot/server/jest.config.cjs", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 1, 17
+"/Users/friedemannfrommelt/steuerpilot/server/package-lock.json", "JSON", 0, 0, 8957, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8958
+"/Users/friedemannfrommelt/steuerpilot/server/package.json", "JSON", 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 50
+"/Users/friedemannfrommelt/steuerpilot/server/src/__tests__/embedding.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 62, 0, 0, 0, 0, 0, 0, 23, 85
+"/Users/friedemannfrommelt/steuerpilot/server/src/__tests__/errors.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 7, 47
+"/Users/friedemannfrommelt/steuerpilot/server/src/__tests__/llm.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 189, 0, 0, 0, 0, 0, 6, 37, 232
+"/Users/friedemannfrommelt/steuerpilot/server/src/__tests__/resolvers.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 448, 0, 0, 0, 0, 0, 22, 52, 522
+"/Users/friedemannfrommelt/steuerpilot/server/src/__tests__/vectorSearch.test.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 110, 0, 0, 0, 0, 0, 0, 31, 141
+"/Users/friedemannfrommelt/steuerpilot/server/src/config/db.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 3, 3, 23
+"/Users/friedemannfrommelt/steuerpilot/server/src/errors/EmbeddingError.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 1, 7
+"/Users/friedemannfrommelt/steuerpilot/server/src/errors/LlmError.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 1, 7
+"/Users/friedemannfrommelt/steuerpilot/server/src/errors/VectorSearchError.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 1, 7
+"/Users/friedemannfrommelt/steuerpilot/server/src/errors/index.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 4
+"/Users/friedemannfrommelt/steuerpilot/server/src/index.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 106, 0, 0, 0, 0, 0, 7, 19, 132
+"/Users/friedemannfrommelt/steuerpilot/server/src/models/BmfChunk.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 4, 28
+"/Users/friedemannfrommelt/steuerpilot/server/src/resolvers/index.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 123, 0, 0, 0, 0, 0, 8, 18, 149
+"/Users/friedemannfrommelt/steuerpilot/server/src/schema/typeDefs.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 2, 35
+"/Users/friedemannfrommelt/steuerpilot/server/src/services/embedding.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 8, 15, 106
+"/Users/friedemannfrommelt/steuerpilot/server/src/services/llm.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 138, 0, 0, 0, 0, 0, 15, 26, 179
+"/Users/friedemannfrommelt/steuerpilot/server/src/services/vectorSearch.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 46, 0, 0, 0, 0, 0, 14, 6, 66
+"/Users/friedemannfrommelt/steuerpilot/server/src/types/chunk.types.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 4, 23
+"/Users/friedemannfrommelt/steuerpilot/server/src/types/context.types.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 2, 6
+"/Users/friedemannfrommelt/steuerpilot/server/src/types/llm.types.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 1, 11
+"/Users/friedemannfrommelt/steuerpilot/server/src/types/search.types.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 6, 47
+"/Users/friedemannfrommelt/steuerpilot/server/tsconfig.json", "JSON with Comments", 0, 0, 0, 0, 0, 0, 0, 0, 19, 0, 0, 0, 4, 1, 24
+"Total", "-", 23, 726, 20403, 646, 655, 10, 2179, 225, 50, 13, 419, 7, 277, 995, 26628

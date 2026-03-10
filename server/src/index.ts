@@ -87,8 +87,6 @@ const corsOptions: cors.CorsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.options("*", cors(corsOptions));
-
 app.use(
   "/graphql",
   graphqlLimiter,

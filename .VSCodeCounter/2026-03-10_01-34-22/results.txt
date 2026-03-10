@@ -1,0 +1,140 @@
+Date : 2026-03-10 01:34:22
+Directory : /Users/friedemannfrommelt/steuerpilot
+Total : 79 files,  25356 codes, 277 comments, 995 blanks, all 26628 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          9 |     20,403 |          0 |          9 |     20,412 |
+| TypeScript         |         25 |      2,179 |        174 |        394 |      2,747 |
+| Markdown           |          6 |        726 |          3 |        258 |        987 |
+| TypeScript JSX     |         13 |        655 |          0 |         79 |        734 |
+| PostCSS            |         12 |        646 |          0 |        109 |        755 |
+| Python             |          1 |        419 |         76 |        115 |        610 |
+| JavaScript         |          4 |        225 |         16 |         25 |        266 |
+| JSON with Comments |          3 |         50 |          8 |          3 |         61 |
+| YAML               |          1 |         23 |          0 |          1 |         24 |
+| HTML               |          1 |         13 |          0 |          1 |         14 |
+| XML                |          3 |         10 |          0 |          1 |         11 |
+| pip requirements   |          1 |          7 |          0 |          0 |          7 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                  | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                     |         79 |     25,356 |        277 |        995 |     26,628 |
+| . (Files)                                                                             |          5 |        582 |          3 |        128 |        713 |
+| client                                                                                |         37 |      5,809 |          1 |        213 |      6,023 |
+| client (Files)                                                                        |          8 |      4,443 |          1 |         17 |      4,461 |
+| client/public                                                                         |          2 |          9 |          0 |          1 |         10 |
+| client/src                                                                            |         27 |      1,357 |          0 |        195 |      1,552 |
+| client/src (Files)                                                                    |          4 |        324 |          0 |         49 |        373 |
+| client/src/assets                                                                     |          1 |          1 |          0 |          0 |          1 |
+| client/src/components                                                                 |         18 |        739 |          0 |        104 |        843 |
+| client/src/graphql                                                                    |          1 |         55 |          0 |          7 |         62 |
+| client/src/pages                                                                      |          3 |        238 |          0 |         35 |        273 |
+| docs                                                                                  |          3 |        335 |          0 |        125 |        460 |
+| scripts                                                                               |          9 |      8,075 |        186 |        265 |      8,526 |
+| scripts (Files)                                                                       |          8 |      7,844 |        176 |        211 |      8,231 |
+| scripts/__tests__                                                                     |          1 |        231 |         10 |         54 |        295 |
+| server                                                                                |         25 |     10,555 |         87 |        264 |     10,906 |
+| server (Files)                                                                        |          4 |      9,041 |          4 |          4 |      9,049 |
+| server/src                                                                            |         21 |      1,514 |         83 |        260 |      1,857 |
+| server/src (Files)                                                                    |          1 |        106 |          7 |         19 |        132 |
+| server/src/__tests__                                                                  |          5 |        849 |         28 |        150 |      1,027 |
+| server/src/config                                                                     |          1 |         17 |          3 |          3 |         23 |
+| server/src/errors                                                                     |          4 |         21 |          0 |          4 |         25 |
+| server/src/models                                                                     |          1 |         24 |          0 |          4 |         28 |
+| server/src/resolvers                                                                  |          1 |        123 |          8 |         18 |        149 |
+| server/src/schema                                                                     |          1 |         33 |          0 |          2 |         35 |
+| server/src/services                                                                   |          3 |        267 |         37 |         47 |        351 |
+| server/src/types                                                                      |          4 |         74 |          0 |         13 |         87 |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                              | language           | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| /Users/friedemannfrommelt/steuerpilot/CLAUDE.md                                       | Markdown           |        326 |          3 |         94 |        423 |
+| /Users/friedemannfrommelt/steuerpilot/README.md                                       | Markdown           |         56 |          0 |         31 |         87 |
+| /Users/friedemannfrommelt/steuerpilot/client/README.md                                | Markdown           |          9 |          0 |          8 |         17 |
+| /Users/friedemannfrommelt/steuerpilot/client/eslint.config.js                         | JavaScript         |         28 |          0 |          2 |         30 |
+| /Users/friedemannfrommelt/steuerpilot/client/index.html                               | HTML               |         13 |          0 |          1 |         14 |
+| /Users/friedemannfrommelt/steuerpilot/client/package-lock.json                        | JSON               |      4,335 |          0 |          1 |      4,336 |
+| /Users/friedemannfrommelt/steuerpilot/client/package.json                             | JSON               |         34 |          0 |          1 |         35 |
+| /Users/friedemannfrommelt/steuerpilot/client/public/sitemap.xml                       | XML                |          8 |          0 |          1 |          9 |
+| /Users/friedemannfrommelt/steuerpilot/client/public/vite.svg                          | XML                |          1 |          0 |          0 |          1 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/App.module.css                       | PostCSS            |        115 |          0 |         22 |        137 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/App.tsx                              | TypeScript JSX     |        139 |          0 |         17 |        156 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/assets/react.svg                     | XML                |          1 |          0 |          0 |          1 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/AnswerDisplay.module.css  | PostCSS            |         63 |          0 |         12 |         75 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/AnswerDisplay.tsx         | TypeScript JSX     |         26 |          0 |          3 |         29 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/ErrorMessage.module.css   | PostCSS            |         12 |          0 |          2 |         14 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/ErrorMessage.tsx          | TypeScript JSX     |         12 |          0 |          3 |         15 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/FaqSection.module.css     | PostCSS            |         59 |          0 |         10 |         69 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/FaqSection.tsx            | TypeScript JSX     |         66 |          0 |          5 |         71 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/Footer.module.css         | PostCSS            |         37 |          0 |          7 |         44 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/Footer.tsx                | TypeScript JSX     |         22 |          0 |          2 |         24 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/Header.module.css         | PostCSS            |         39 |          0 |          4 |         43 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/Header.tsx                | TypeScript JSX     |         26 |          0 |          4 |         30 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/LoadingSpinner.module.css | PostCSS            |         24 |          0 |          4 |         28 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/LoadingSpinner.tsx        | TypeScript JSX     |          9 |          0 |          2 |         11 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/SearchForm.module.css     | PostCSS            |         92 |          0 |         14 |        106 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/SearchForm.tsx            | TypeScript JSX     |         76 |          0 |          7 |         83 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/SourceCard.module.css     | PostCSS            |         84 |          0 |         14 |         98 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/SourceCard.tsx            | TypeScript JSX     |         52 |          0 |          4 |         56 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/SourceList.module.css     | PostCSS            |         21 |          0 |          3 |         24 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/components/SourceList.tsx            | TypeScript JSX     |         19 |          0 |          4 |         23 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/graphql/queries.ts                   | TypeScript         |         55 |          0 |          7 |         62 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/index.css                            | PostCSS            |         32 |          0 |          4 |         36 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/main.tsx                             | TypeScript JSX     |         38 |          0 |          6 |         44 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/pages/Datenschutz.tsx                | TypeScript JSX     |        109 |          0 |         11 |        120 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/pages/Impressum.tsx                  | TypeScript JSX     |         61 |          0 |         11 |         72 |
+| /Users/friedemannfrommelt/steuerpilot/client/src/pages/LegalPage.module.css           | PostCSS            |         68 |          0 |         13 |         81 |
+| /Users/friedemannfrommelt/steuerpilot/client/tsconfig.json                            | JSON with Comments |         14 |          0 |          1 |         15 |
+| /Users/friedemannfrommelt/steuerpilot/client/vercel.json                              | JSON               |          5 |          0 |          1 |          6 |
+| /Users/friedemannfrommelt/steuerpilot/client/vite.config.ts                           | TypeScript         |          5 |          1 |          2 |          8 |
+| /Users/friedemannfrommelt/steuerpilot/docs/ARCHITECTURE.md                            | Markdown           |        200 |          0 |         44 |        244 |
+| /Users/friedemannfrommelt/steuerpilot/docs/LEGAL.md                                   | Markdown           |         62 |          0 |         38 |        100 |
+| /Users/friedemannfrommelt/steuerpilot/docs/ROADMAP.md                                 | Markdown           |         73 |          0 |         43 |        116 |
+| /Users/friedemannfrommelt/steuerpilot/package-lock.json                               | JSON               |        165 |          0 |          1 |        166 |
+| /Users/friedemannfrommelt/steuerpilot/package.json                                    | JSON               |         12 |          0 |          1 |         13 |
+| /Users/friedemannfrommelt/steuerpilot/render.yaml                                     | YAML               |         23 |          0 |          1 |         24 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/__tests__/ingest.test.ts                | TypeScript         |        231 |         10 |         54 |        295 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/dsgvo-check.js                          | JavaScript         |        164 |         14 |         21 |        199 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/ingest.ts                               | TypeScript         |        374 |         80 |         71 |        525 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/ingest_bulk_local.py                    | Python             |        419 |         76 |        115 |        610 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/jest.config.cjs                         | JavaScript         |         17 |          2 |          1 |         20 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/package-lock.json                       | JSON               |      6,816 |          0 |          1 |      6,817 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/package.json                            | JSON               |         30 |          0 |          1 |         31 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/requirements.txt                        | pip requirements   |          7 |          0 |          0 |          7 |
+| /Users/friedemannfrommelt/steuerpilot/scripts/tsconfig.json                           | JSON with Comments |         17 |          4 |          1 |         22 |
+| /Users/friedemannfrommelt/steuerpilot/server/jest.config.cjs                          | JavaScript         |         16 |          0 |          1 |         17 |
+| /Users/friedemannfrommelt/steuerpilot/server/package-lock.json                        | JSON               |      8,957 |          0 |          1 |      8,958 |
+| /Users/friedemannfrommelt/steuerpilot/server/package.json                             | JSON               |         49 |          0 |          1 |         50 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/__tests__/embedding.test.ts          | TypeScript         |         62 |          0 |         23 |         85 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/__tests__/errors.test.ts             | TypeScript         |         40 |          0 |          7 |         47 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/__tests__/llm.test.ts                | TypeScript         |        189 |          6 |         37 |        232 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/__tests__/resolvers.test.ts          | TypeScript         |        448 |         22 |         52 |        522 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/__tests__/vectorSearch.test.ts       | TypeScript         |        110 |          0 |         31 |        141 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/config/db.ts                         | TypeScript         |         17 |          3 |          3 |         23 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/errors/EmbeddingError.ts             | TypeScript         |          6 |          0 |          1 |          7 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/errors/LlmError.ts                   | TypeScript         |          6 |          0 |          1 |          7 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/errors/VectorSearchError.ts          | TypeScript         |          6 |          0 |          1 |          7 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/errors/index.ts                      | TypeScript         |          3 |          0 |          1 |          4 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/index.ts                             | TypeScript         |        106 |          7 |         19 |        132 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/models/BmfChunk.ts                   | TypeScript         |         24 |          0 |          4 |         28 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/resolvers/index.ts                   | TypeScript         |        123 |          8 |         18 |        149 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/schema/typeDefs.ts                   | TypeScript         |         33 |          0 |          2 |         35 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/services/embedding.ts                | TypeScript         |         83 |          8 |         15 |        106 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/services/llm.ts                      | TypeScript         |        138 |         15 |         26 |        179 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/services/vectorSearch.ts             | TypeScript         |         46 |         14 |          6 |         66 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/types/chunk.types.ts                 | TypeScript         |         19 |          0 |          4 |         23 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/types/context.types.ts               | TypeScript         |          4 |          0 |          2 |          6 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/types/llm.types.ts                   | TypeScript         |         10 |          0 |          1 |         11 |
+| /Users/friedemannfrommelt/steuerpilot/server/src/types/search.types.ts                | TypeScript         |         41 |          0 |          6 |         47 |
+| /Users/friedemannfrommelt/steuerpilot/server/tsconfig.json                            | JSON with Comments |         19 |          4 |          1 |         24 |
+| Total                                                                                 |                    |     25,356 |        277 |        995 |     26,628 |
++---------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
