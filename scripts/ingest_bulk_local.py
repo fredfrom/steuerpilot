@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-# Disable MPS before any PyTorch imports
+# Disable MPS and all parallelism before any PyTorch/tokenizer imports
 import os
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
 os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '0'
 os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
-os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 """
 ingest_bulk_local.py — One-off local bulk ingestion of all historical BMF-Schreiben.
@@ -526,7 +528,7 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
             total_batches = (len(prefixed_chunks) + EMBED_BATCH_SIZE - 1) // EMBED_BATCH_SIZE
             for batch_idx, batch_start in enumerate(range(0, len(prefixed_chunks), EMBED_BATCH_SIZE)):
                 batch = prefixed_chunks[batch_start:batch_start + EMBED_BATCH_SIZE]
-                batch_embeddings = model.encode(batch, show_progress_bar=False)
+                batch_embeddings = model.encode(batch, show_progress_bar=False, num_workers=0)
                 embedding_list.extend(batch_embeddings.tolist())
                 del batch_embeddings
                 gc.collect()
