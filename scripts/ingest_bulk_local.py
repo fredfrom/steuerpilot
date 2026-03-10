@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# Disable MPS before any PyTorch imports
+import os
+os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '0'
+os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.0'
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+
 """
 ingest_bulk_local.py — One-off local bulk ingestion of all historical BMF-Schreiben.
 
@@ -17,8 +23,8 @@ Usage:
 """
 
 import argparse
+import gc
 import io
-import os
 import re
 import sys
 import time
@@ -49,6 +55,7 @@ EMBEDDING_MODEL_NAME = "mixedbread-ai/deepset-mxbai-embed-de-large-v1"
 # The mxbai model requires a prefix for document passages
 PASSAGE_PREFIX = "passage: "
 
+EMBED_BATCH_SIZE = 4
 COLLECTION_NAME = "bmf_chunks"
 REQUEST_TIMEOUT = 60
 
@@ -469,7 +476,7 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
     print("\nLoading embedding model (this may take a few minutes on first run)...")
     from sentence_transformers import SentenceTransformer
 
-    model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+    model = SentenceTransformer(EMBEDDING_MODEL_NAME, device="cpu")
     print(f"  Model loaded: {EMBEDDING_MODEL_NAME}")
 
     # Phase 3: Connect to MongoDB
@@ -513,10 +520,18 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
                 continue
             print(f"  Created {len(chunks)} chunks")
 
-            # Generate embeddings with passage: prefix
+            # Generate embeddings with passage: prefix (batched to avoid OOM on large docs)
             prefixed_chunks = [PASSAGE_PREFIX + c for c in chunks]
-            embeddings = model.encode(prefixed_chunks, show_progress_bar=False)
-            embedding_list = [emb.tolist() for emb in embeddings]
+            embedding_list: list[list[float]] = []
+            total_batches = (len(prefixed_chunks) + EMBED_BATCH_SIZE - 1) // EMBED_BATCH_SIZE
+            for batch_idx, batch_start in enumerate(range(0, len(prefixed_chunks), EMBED_BATCH_SIZE)):
+                batch = prefixed_chunks[batch_start:batch_start + EMBED_BATCH_SIZE]
+                batch_embeddings = model.encode(batch, show_progress_bar=False)
+                embedding_list.extend(batch_embeddings.tolist())
+                del batch_embeddings
+                gc.collect()
+                if total_batches > 5 and (batch_idx + 1) % 5 == 0:
+                    print(f"    Embedded batch {batch_idx + 1}/{total_batches}")
 
             # Validate dimensions
             for emb in embedding_list:
