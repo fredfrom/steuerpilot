@@ -48,7 +48,8 @@ interface IngestionConfig {
 
 // ── Constants ──────────────────────────────────────────────────────────
 
-const EMBEDDING_DIMENSIONS = 1024;
+const EMBEDDING_DIMENSIONS_RAW = 1024;
+const EMBEDDING_DIMENSIONS = 512;
 const BMF_BASE_URL = "https://www.bundesfinanzministerium.de";
 const RSS_FEED_URL = `${BMF_BASE_URL}/SiteGlobals/Functions/RSSFeed/DE/Steuern/RSSSteuern.xml`;
 const HUGGINGFACE_API_URL =
@@ -312,9 +313,17 @@ export function extractMetadata(
   };
 }
 
+/** Truncate to first N dims and re-normalize (Matryoshka truncation). */
+function truncateAndNormalize(embedding: number[], dims: number): number[] {
+  const truncated = embedding.slice(0, dims);
+  const norm = Math.sqrt(truncated.reduce((sum, x) => sum + x * x, 0));
+  if (norm === 0) return truncated;
+  return truncated.map((x) => x / norm);
+}
+
 /**
  * Embed an array of text chunks using the HuggingFace Inference API.
- * Model: mixedbread-ai/deepset-mxbai-embed-de-large-v1 (1024 dimensions).
+ * Model: mixedbread-ai/deepset-mxbai-embed-de-large-v1 (1024 raw → 512 Matryoshka).
  * Sends chunks one at a time to avoid payload size limits.
  */
 export async function embedChunks(chunks: string[]): Promise<number[][]> {
@@ -333,17 +342,17 @@ export async function embedChunks(chunks: string[]): Promise<number[][]> {
       }
     );
 
-    const embedding = Array.isArray(response.data[0])
+    const rawEmbedding = Array.isArray(response.data[0])
       ? (response.data[0] as number[])
       : response.data;
 
-    if (embedding.length !== EMBEDDING_DIMENSIONS) {
+    if (rawEmbedding.length !== EMBEDDING_DIMENSIONS_RAW) {
       throw new Error(
-        `Embedding dimension mismatch: expected ${String(EMBEDDING_DIMENSIONS)}, got ${String(embedding.length)}`
+        `Embedding dimension mismatch: expected ${String(EMBEDDING_DIMENSIONS_RAW)} raw, got ${String(rawEmbedding.length)}`
       );
     }
 
-    embeddings.push(embedding);
+    embeddings.push(truncateAndNormalize(rawEmbedding, EMBEDDING_DIMENSIONS));
   }
 
   return embeddings;

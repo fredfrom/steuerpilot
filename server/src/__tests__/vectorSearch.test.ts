@@ -6,7 +6,7 @@ jest.mock("../models/BmfChunk.js");
 
 const mockedBmfChunk = BmfChunk as jest.Mocked<typeof BmfChunk>;
 
-const QUERY_EMBEDDING = new Array(1024).fill(0.5) as number[];
+const QUERY_EMBEDDING = new Array(512).fill(0.5) as number[];
 
 const MOCK_RESULTS = [
   {

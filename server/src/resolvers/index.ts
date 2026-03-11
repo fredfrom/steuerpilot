@@ -122,13 +122,15 @@ export const resolvers = {
     },
 
     stats: async (): Promise<IndexStats> => {
-      const totalDocuments = await BmfChunk.countDocuments().exec();
+      const uniqueDocIds = await BmfChunk.distinct("doc_id").exec();
+      const totalDocuments = uniqueDocIds.length;
 
       const byCategory = await BmfChunk.aggregate<{
         steuerart: string;
         count: number;
       }>([
-        { $group: { _id: "$metadata.steuerart", count: { $sum: 1 } } },
+        { $group: { _id: { steuerart: "$metadata.steuerart", doc_id: "$doc_id" } } },
+        { $group: { _id: "$_id.steuerart", count: { $sum: 1 } } },
         { $project: { _id: 0, steuerart: "$_id", count: 1 } },
         { $sort: { count: -1 } },
       ]);

@@ -5,7 +5,8 @@ import { EmbeddingError } from "../errors/index.js";
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const VALID_EMBEDDING = new Array(1024).fill(0.1) as number[];
+// HF API returns 1024 dims; our functions truncate to 512 (Matryoshka)
+const RAW_EMBEDDING_1024 = new Array(1024).fill(0.1) as number[];
 
 beforeEach(() => {
   process.env.HUGGINGFACE_API_KEY = "test-key";
@@ -16,12 +17,12 @@ afterEach(() => {
 });
 
 describe("embedText", () => {
-  it("returns a 1024-dimensional embedding for valid input", async () => {
-    mockedAxios.post.mockResolvedValueOnce({ data: VALID_EMBEDDING });
+  it("returns a 512-dimensional embedding (truncated from 1024)", async () => {
+    mockedAxios.post.mockResolvedValueOnce({ data: RAW_EMBEDDING_1024 });
 
     const result = await embedText("test input");
 
-    expect(result).toHaveLength(1024);
+    expect(result).toHaveLength(512);
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
   });
 
@@ -34,9 +35,9 @@ describe("embedText", () => {
     );
   });
 
-  it("throws EmbeddingError when API returns wrong dimensions", async () => {
+  it("throws EmbeddingError when API returns wrong raw dimensions", async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: new Array(512).fill(0.1),
+      data: new Array(768).fill(0.1),
     });
 
     await expect(embedText("test")).rejects.toThrow(EmbeddingError);
@@ -56,16 +57,16 @@ describe("embedText", () => {
 });
 
 describe("embedBatch", () => {
-  it("returns embeddings for multiple inputs", async () => {
+  it("returns 512-dim embeddings for multiple inputs", async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: [VALID_EMBEDDING, VALID_EMBEDDING],
+      data: [RAW_EMBEDDING_1024, RAW_EMBEDDING_1024],
     });
 
     const result = await embedBatch(["text1", "text2"]);
 
     expect(result).toHaveLength(2);
-    expect(result[0]).toHaveLength(1024);
-    expect(result[1]).toHaveLength(1024);
+    expect(result[0]).toHaveLength(512);
+    expect(result[1]).toHaveLength(512);
   });
 
   it("throws EmbeddingError when API key is missing", async () => {
@@ -74,9 +75,9 @@ describe("embedBatch", () => {
     await expect(embedBatch(["test"])).rejects.toThrow(EmbeddingError);
   });
 
-  it("throws EmbeddingError when any embedding has wrong dimensions", async () => {
+  it("throws EmbeddingError when any embedding has wrong raw dimensions", async () => {
     mockedAxios.post.mockResolvedValueOnce({
-      data: [VALID_EMBEDDING, new Array(512).fill(0.1)],
+      data: [RAW_EMBEDDING_1024, new Array(768).fill(0.1)],
     });
 
     await expect(embedBatch(["a", "b"])).rejects.toThrow(EmbeddingError);

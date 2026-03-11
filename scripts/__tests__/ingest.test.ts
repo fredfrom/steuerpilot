@@ -91,7 +91,9 @@ const SAMPLE_HTML_WITH_PDF = `<html><body>
 
 const SAMPLE_HTML_NO_PDF = `<html><body><p>No PDF link here</p></body></html>`;
 
-const MOCK_EMBEDDING = new Array(1024).fill(0.1) as number[];
+// HF API returns 1024 raw; embedChunks truncates to 512 (Matryoshka)
+const MOCK_RAW_EMBEDDING = new Array(1024).fill(0.1) as number[];
+const MOCK_EMBEDDING = new Array(512).fill(0.1) as number[];
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -176,20 +178,20 @@ describe("Ingestion pipeline", () => {
   });
 
   describe("embedChunks", () => {
-    it("returns one embedding per chunk with correct dimensions", async () => {
+    it("returns one embedding per chunk truncated to 512 dims", async () => {
       mockedAxios.post
-        .mockResolvedValueOnce({ data: MOCK_EMBEDDING } as never)
-        .mockResolvedValueOnce({ data: MOCK_EMBEDDING } as never);
+        .mockResolvedValueOnce({ data: MOCK_RAW_EMBEDDING } as never)
+        .mockResolvedValueOnce({ data: MOCK_RAW_EMBEDDING } as never);
 
       const embeddings = await embedChunks(["chunk1", "chunk2"]);
 
       expect(embeddings).toHaveLength(2);
-      expect(embeddings[0]).toHaveLength(1024);
-      expect(embeddings[1]).toHaveLength(1024);
+      expect(embeddings[0]).toHaveLength(512);
+      expect(embeddings[1]).toHaveLength(512);
     });
 
     it("throws on embedding dimension mismatch", async () => {
-      const wrongDimEmbedding = new Array(512).fill(0.1);
+      const wrongDimEmbedding = new Array(768).fill(0.1);
       mockedAxios.post.mockResolvedValueOnce({ data: wrongDimEmbedding } as never);
 
       await expect(embedChunks(["chunk"])).rejects.toThrow(

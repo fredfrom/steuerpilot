@@ -44,7 +44,7 @@ TOTAL_PAGES = 51
 CRAWL_DELAY_SECONDS = 3
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
-EMBEDDING_DIMENSIONS = 1024
+EMBEDDING_DIMENSIONS = 512
 EMBEDDING_MODEL_NAME = "mixedbread-ai/deepset-mxbai-embed-de-large-v1"
 ONNX_MODEL_FILE = "onnx/model.onnx"
 # The mxbai model requires a prefix for document passages
@@ -534,12 +534,13 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
                     "input_ids": encoded["input_ids"].astype(np.int64),
                     "attention_mask": encoded["attention_mask"].astype(np.int64),
                 })
-                # Mean pooling + L2 normalize
+                # Mean pooling + Matryoshka truncation to 512 dims + L2 normalize
                 hidden = outputs[0]
                 mask = encoded["attention_mask"][:, :, np.newaxis]
                 pooled = (hidden * mask).sum(axis=1) / mask.sum(axis=1)
-                norms = np.linalg.norm(pooled, axis=1, keepdims=True)
-                normalized = pooled / norms
+                truncated = pooled[:, :EMBEDDING_DIMENSIONS]
+                norms = np.linalg.norm(truncated, axis=1, keepdims=True)
+                normalized = truncated / norms
                 embedding_list.extend(normalized.tolist())
                 if total_batches > 2 and (batch_idx + 1) % 2 == 0:
                     print(f"    Batch {batch_idx + 1}/{total_batches}", flush=True)

@@ -247,7 +247,7 @@ export interface ApolloContext {
 - Embedding calls to HuggingFace must always have a timeout and explicit error handling
 - Never call the embedding service inside a resolver — embeddings are generated at ingest time only, not at query time
 - LLM responses are non-deterministic — tests for LLM output must assert structure and presence only, never exact string content
-- Always validate that embedding dimensions match (1024) before storing — a dimension mismatch silently breaks vector search
+- Always validate that embedding dimensions match (512, Matryoshka-truncated from 1024) before storing — a dimension mismatch silently breaks vector search
 
 ### Async Patterns
 - Never use await inside a for loop unless serialization is explicitly required (e.g. respecting crawl delay in ingestion)

@@ -27,7 +27,7 @@ const mockedGenerateAnswer = generateAnswer as jest.MockedFunction<
 >;
 const mockedBmfChunk = BmfChunk as jest.Mocked<typeof BmfChunk>;
 
-const MOCK_EMBEDDING = new Array(1024).fill(0.1) as number[];
+const MOCK_EMBEDDING = new Array(512).fill(0.1) as number[];
 
 const MOCK_CHUNKS = [
   {
@@ -455,10 +455,12 @@ describe("GraphQL resolvers", () => {
 
   describe("stats query", () => {
     it("returns totalDocuments, lastUpdated, and byCategory", async () => {
-      // Mock BmfChunk.countDocuments().exec()
-      const mockExec = jest.fn().mockResolvedValue(42);
-      mockedBmfChunk.countDocuments.mockReturnValue({
-        exec: mockExec,
+      // Mock BmfChunk.distinct("doc_id").exec()
+      const mockDistinctExec = jest.fn().mockResolvedValue(
+        Array.from({ length: 42 }, (_, i) => `doc-${String(i)}`)
+      );
+      mockedBmfChunk.distinct.mockReturnValue({
+        exec: mockDistinctExec,
       } as never);
 
       // Mock BmfChunk.aggregate() for byCategory

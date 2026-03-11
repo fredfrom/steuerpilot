@@ -17,7 +17,7 @@ const SIMILARITY_THRESHOLD = 0.75;
 
 /**
  * Perform a MongoDB Atlas vector search on the bmf_chunks collection.
- * Uses the "vector_index" with cosine similarity and 1024 dimensions.
+ * Uses the "vector_index" with cosine similarity and 512 dimensions (Matryoshka).
  * Filters out superseded documents automatically.
  */
 export async function searchChunks(
