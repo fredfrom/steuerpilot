@@ -93,7 +93,7 @@ const SAMPLE_HTML_NO_PDF = `<html><body><p>No PDF link here</p></body></html>`;
 
 // HF API returns 1024 raw; embedChunks truncates to 512 (Matryoshka)
 const MOCK_RAW_EMBEDDING = new Array(1024).fill(0.1) as number[];
-const MOCK_EMBEDDING = new Array(512).fill(0.1) as number[];
+const MOCK_EMBEDDING = new Array(256).fill(0.1) as number[];
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -178,7 +178,7 @@ describe("Ingestion pipeline", () => {
   });
 
   describe("embedChunks", () => {
-    it("returns one embedding per chunk truncated to 512 dims", async () => {
+    it("returns one embedding per chunk truncated to 256 dims", async () => {
       mockedAxios.post
         .mockResolvedValueOnce({ data: MOCK_RAW_EMBEDDING } as never)
         .mockResolvedValueOnce({ data: MOCK_RAW_EMBEDDING } as never);
@@ -186,8 +186,8 @@ describe("Ingestion pipeline", () => {
       const embeddings = await embedChunks(["chunk1", "chunk2"]);
 
       expect(embeddings).toHaveLength(2);
-      expect(embeddings[0]).toHaveLength(512);
-      expect(embeddings[1]).toHaveLength(512);
+      expect(embeddings[0]).toHaveLength(256);
+      expect(embeddings[1]).toHaveLength(256);
     });
 
     it("throws on embedding dimension mismatch", async () => {

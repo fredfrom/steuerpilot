@@ -44,7 +44,7 @@ TOTAL_PAGES = 51
 CRAWL_DELAY_SECONDS = 3
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
-EMBEDDING_DIMENSIONS = 512
+EMBEDDING_DIMENSIONS = 256
 EMBEDDING_MODEL_NAME = "mixedbread-ai/deepset-mxbai-embed-de-large-v1"
 ONNX_MODEL_FILE = "onnx/model.onnx"
 # The mxbai model requires a prefix for document passages

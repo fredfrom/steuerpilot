@@ -49,7 +49,7 @@ interface IngestionConfig {
 // ── Constants ──────────────────────────────────────────────────────────
 
 const EMBEDDING_DIMENSIONS_RAW = 1024;
-const EMBEDDING_DIMENSIONS = 512;
+const EMBEDDING_DIMENSIONS = 256;
 const BMF_BASE_URL = "https://www.bundesfinanzministerium.de";
 const RSS_FEED_URL = `${BMF_BASE_URL}/SiteGlobals/Functions/RSSFeed/DE/Steuern/RSSSteuern.xml`;
 const HUGGINGFACE_API_URL =

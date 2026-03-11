@@ -22,7 +22,7 @@ describe("embedText", () => {
 
     const result = await embedText("test input");
 
-    expect(result).toHaveLength(512);
+    expect(result).toHaveLength(256);
     expect(mockedAxios.post).toHaveBeenCalledTimes(1);
   });
 
@@ -65,8 +65,8 @@ describe("embedBatch", () => {
     const result = await embedBatch(["text1", "text2"]);
 
     expect(result).toHaveLength(2);
-    expect(result[0]).toHaveLength(512);
-    expect(result[1]).toHaveLength(512);
+    expect(result[0]).toHaveLength(256);
+    expect(result[1]).toHaveLength(256);
   });
 
   it("throws EmbeddingError when API key is missing", async () => {

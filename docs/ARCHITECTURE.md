@@ -15,7 +15,7 @@ bundesfinanzministerium.de
          ▼
 ┌─────────────────┐
 │  MongoDB Atlas  │  M0 Free Tier
-│  bmf_chunks     │  Vector Search Index (cosine, 512 dims, Matryoshka from 1024)
+│  bmf_chunks     │  Vector Search Index (cosine, 256 dims, Matryoshka from 1024)
 └────────┬────────┘
          │
          ▼
@@ -53,7 +53,7 @@ Two distinct ingestion paths serve different purposes:
 2. For each document: check MongoDB (already ingested?) → skip if yes
 3. Fetch PDF into memory → extract text with pdfplumber
 4. Chunk: recursive split (1000 chars, 200 overlap, German legal separators)
-5. Embed: mxbai-embed-de-large-v1 via HuggingFace Inference API (512 dims, Matryoshka from 1024)
+5. Embed: mxbai-embed-de-large-v1 via HuggingFace Inference API (256 dims, Matryoshka from 1024)
 6. Upsert chunks + metadata into MongoDB Atlas
 7. Buffer garbage-collected — no PDF bytes remain on disk or in memory
 ```
@@ -78,7 +78,7 @@ Two distinct ingestion paths serve different purposes:
    - overlap: 50 tokens
    - separators: ["\n\n", "\nRz.", "\n§", "\n1.", "\n2.", "\n"]
 6. Extract metadata: date, GZ (Aktenzeichen), Steuerart, §-references, BMF URL
-7. Embed: mxbai-embed-de-large-v1 via HuggingFace Inference API (512 dims, Matryoshka from 1024)
+7. Embed: mxbai-embed-de-large-v1 via HuggingFace Inference API (256 dims, Matryoshka from 1024)
 8. Upsert vectors + metadata into MongoDB Atlas — no PDF bytes stored
 9. Buffer garbage-collected — no original document remains on server
 ```
@@ -131,7 +131,7 @@ robots.txt requires a 180-second crawl delay. This is strictly respected. `/Cont
   "doc_id": "2025-03-06-kryptowerte",
   "chunk_index": 3,
   "text": "Beim Proof of Stake gilt die Blockerstellung...",
-  "embedding": [0.023, -0.441, "... 512 dims total"],
+  "embedding": [0.023, -0.441, "... 256 dims total"],
   "metadata": {
     "date": "2025-03-06",
     "gz": "IV C 1 - S 2256/19/10003",
@@ -152,7 +152,7 @@ robots.txt requires a 180-second crawl delay. This is strictly respected. `/Cont
     {
       "type": "vector",
       "path": "embedding",
-      "numDimensions": 512,
+      "numDimensions": 256,
       "similarity": "cosine"
     },
     {
@@ -211,7 +211,7 @@ type CategoryCount {
 
 **`mixedbread-ai/deepset-mxbai-embed-de-large-v1`**
 
-- 1024 native dimensions, truncated to 512 via Matryoshka (~93% quality)
+- 1024 native dimensions, truncated to 256 via Matryoshka (~85% quality)
 - Trained on 30M+ German text pairs
 - State-of-the-art for German retrieval tasks
 - Supports Matryoshka truncation (512 dims @ 93% performance)

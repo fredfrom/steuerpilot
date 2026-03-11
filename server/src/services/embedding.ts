@@ -5,7 +5,7 @@ const HUGGINGFACE_API_URL =
   "https://router.huggingface.co/hf-inference/models/mixedbread-ai/deepset-mxbai-embed-de-large-v1/pipeline/feature-extraction";
 
 const EMBEDDING_DIMENSIONS_RAW = 1024;
-const EMBEDDING_DIMENSIONS = 512;
+const EMBEDDING_DIMENSIONS = 256;
 const TIMEOUT_MS = 30_000;
 
 /** Truncate to first N dims and re-normalize (Matryoshka truncation). */
@@ -21,7 +21,7 @@ function truncateAndNormalize(
 
 /**
  * Embed a single text string using the HuggingFace Inference API.
- * Returns a 512-dimensional float array (Matryoshka truncation from 1024).
+ * Returns a 256-dimensional float array (Matryoshka truncation from 1024).
  */
 export async function embedText(text: string): Promise<number[]> {
   const apiKey = process.env.HUGGINGFACE_API_KEY;
@@ -61,7 +61,7 @@ export async function embedText(text: string): Promise<number[]> {
 
 /**
  * Embed multiple text strings in a single batch request.
- * Returns an array of 512-dimensional float arrays (Matryoshka truncation from 1024).
+ * Returns an array of 256-dimensional float arrays (Matryoshka truncation from 1024).
  */
 export async function embedBatch(texts: string[]): Promise<number[][]> {
   const apiKey = process.env.HUGGINGFACE_API_KEY;

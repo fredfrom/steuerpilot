@@ -23,7 +23,7 @@ from pathlib import Path
 import pymongo
 from dotenv import load_dotenv
 
-TARGET_DIMS = 512
+TARGET_DIMS = 256
 BATCH_SIZE = 500
 
 

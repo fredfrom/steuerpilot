@@ -27,7 +27,7 @@ const mockedGenerateAnswer = generateAnswer as jest.MockedFunction<
 >;
 const mockedBmfChunk = BmfChunk as jest.Mocked<typeof BmfChunk>;
 
-const MOCK_EMBEDDING = new Array(512).fill(0.1) as number[];
+const MOCK_EMBEDDING = new Array(256).fill(0.1) as number[];
 
 const MOCK_CHUNKS = [
   {
