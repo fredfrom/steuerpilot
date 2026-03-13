@@ -18,12 +18,15 @@ Usage:
 
 import argparse
 import io
+import json
 import os
 import re
 import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 import pdfplumber
 import pymongo
@@ -53,6 +56,16 @@ PASSAGE_PREFIX = "passage: "
 EMBED_BATCH_SIZE = 16
 COLLECTION_NAME = "bmf_chunks"
 REQUEST_TIMEOUT = 60
+
+# TLDR generation via Groq (free tier)
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama-3.1-8b-instant"
+TLDR_SYSTEM_PROMPT = (
+    "Fasse den folgenden Abschnitt aus einem BMF-Schreiben in 1-2 "
+    "prägnanten Sätzen zusammen. Nur die Zusammenfassung, keine Einleitung."
+)
+TLDR_DELAY_SECONDS = 2.1
+TLDR_MAX_RETRIES = 3
 
 
 # ── Data classes ───────────────────────────────────────────────────────────
@@ -372,6 +385,66 @@ def fetch_and_parse_pdf(session: requests.Session, pdf_url: str) -> str:
     return "\n\n".join(text_parts)
 
 
+# ── TLDR generation ───────────────────────────────────────────────────────
+
+
+def generate_tldr(api_key: str, chunk_text: str) -> str | None:
+    """Generate a 1-2 sentence TLDR via Groq API. Returns None on failure."""
+    payload = json.dumps({
+        "model": GROQ_MODEL,
+        "messages": [
+            {"role": "system", "content": TLDR_SYSTEM_PROMPT},
+            {"role": "user", "content": chunk_text[:3000]},
+        ],
+        "max_tokens": 150,
+    }).encode("utf-8")
+
+    req = Request(
+        GROQ_API_URL,
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "Steuerpilot-TLDR/1.0",
+        },
+        method="POST",
+    )
+
+    for attempt in range(TLDR_MAX_RETRIES):
+        try:
+            with urlopen(req, timeout=30) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+                content = body.get("choices", [{}])[0].get("message", {}).get("content")
+                if isinstance(content, str) and content.strip():
+                    return content.strip()
+                return None
+        except HTTPError as e:
+            if e.code == 429:
+                wait = 10 * (attempt + 1)
+                print(f"    TLDR rate limited, waiting {wait}s...", flush=True)
+                time.sleep(wait)
+                continue
+            return None
+        except Exception:
+            return None
+    return None
+
+
+def generate_tldrs_for_chunks(
+    api_key: str | None, chunks: list[str]
+) -> list[str | None]:
+    """Generate TLDRs for a list of chunks. Returns list of TLDRs (None on failure)."""
+    if not api_key:
+        return [None] * len(chunks)
+
+    tldrs: list[str | None] = []
+    for chunk_text in chunks:
+        tldr = generate_tldr(api_key, chunk_text)
+        tldrs.append(tldr)
+        time.sleep(TLDR_DELAY_SECONDS)
+    return tldrs
+
+
 # ── MongoDB operations ────────────────────────────────────────────────────
 
 
@@ -392,10 +465,12 @@ def upsert_chunks(
     embeddings: list[list[float]],
     metadata: dict[str, object],
     doc_id: str,
+    tldrs: list[str | None] | None = None,
 ) -> int:
     """Upsert chunk documents into MongoDB. Returns number of new inserts."""
     operations = []
     for i, (chunk_text_val, embedding) in enumerate(zip(chunks, embeddings)):
+        tldr = tldrs[i] if tldrs and i < len(tldrs) else None
         operations.append(
             pymongo.UpdateOne(
                 {"doc_id": doc_id, "chunk_index": i},
@@ -405,6 +480,7 @@ def upsert_chunks(
                         "chunk_index": i,
                         "text": chunk_text_val,
                         "embedding": embedding,
+                        "tldr": tldr,
                         "metadata": {
                             **metadata,
                             "is_superseded": False,
@@ -565,9 +641,15 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
                 "paragraphen": extract_paragraphen(text),
             }
 
+            # Generate TLDRs via Groq (non-critical, failures return None)
+            groq_key = os.environ.get("GROQ_API_KEY")
+            tldrs = generate_tldrs_for_chunks(groq_key, chunks)
+            tldr_count = sum(1 for t in tldrs if t is not None)
+            print(f"  Generated {tldr_count}/{len(chunks)} TLDRs")
+
             # Upsert to MongoDB
             doc_id = extract_doc_id(doc.pdf_url)
-            inserted = upsert_chunks(collection, chunks, embedding_list, metadata, doc_id)
+            inserted = upsert_chunks(collection, chunks, embedding_list, metadata, doc_id, tldrs)
             print(f"  Upserted: {inserted} new chunks")
 
             stats.documents_processed += 1
