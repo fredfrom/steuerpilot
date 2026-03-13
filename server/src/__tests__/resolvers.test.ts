@@ -12,11 +12,13 @@ jest.mock("../services/embedding.js");
 jest.mock("../services/vectorSearch.js");
 jest.mock("../services/llm.js");
 jest.mock("../models/BmfChunk.js");
+jest.mock("../models/AppMeta.js");
 
 import { embedText } from "../services/embedding.js";
 import { searchChunks } from "../services/vectorSearch.js";
 import { generateAnswer } from "../services/llm.js";
 import { BmfChunk } from "../models/BmfChunk.js";
+import { getLastChecked } from "../models/AppMeta.js";
 
 const mockedEmbedText = embedText as jest.MockedFunction<typeof embedText>;
 const mockedSearchChunks = searchChunks as jest.MockedFunction<
@@ -26,6 +28,7 @@ const mockedGenerateAnswer = generateAnswer as jest.MockedFunction<
   typeof generateAnswer
 >;
 const mockedBmfChunk = BmfChunk as jest.Mocked<typeof BmfChunk>;
+const mockedGetLastChecked = getLastChecked as jest.MockedFunction<typeof getLastChecked>;
 
 const MOCK_EMBEDDING = new Array(256).fill(0.1) as number[];
 
@@ -469,22 +472,8 @@ describe("GraphQL resolvers", () => {
         { steuerart: "Umsatzsteuer", count: 17 },
       ]);
 
-      // Mock BmfChunk.findOne().sort().select().lean().exec() for lastUpdated
-      const mockLeanExec = jest
-        .fn()
-        .mockResolvedValue({ metadata: { date: "2024-03-15" } });
-      const mockLean = jest
-        .fn()
-        .mockReturnValue({ exec: mockLeanExec });
-      const mockSelect = jest
-        .fn()
-        .mockReturnValue({ lean: mockLean });
-      const mockSort = jest
-        .fn()
-        .mockReturnValue({ select: mockSelect });
-      mockedBmfChunk.findOne.mockReturnValue({
-        sort: mockSort,
-      } as never);
+      // Mock getLastChecked()
+      mockedGetLastChecked.mockResolvedValueOnce("2024-03-15T06:00:00.000Z");
 
       const response = await request(app)
         .post("/graphql")
@@ -508,7 +497,7 @@ describe("GraphQL resolvers", () => {
 
       const stats = response.body.data.stats;
       expect(stats.totalDocuments).toBe(42);
-      expect(stats.lastUpdated).toBe("2024-03-15");
+      expect(stats.lastUpdated).toBe("2024-03-15T06:00:00.000Z");
       expect(stats.byCategory).toHaveLength(2);
       expect(stats.byCategory[0]).toEqual({
         steuerart: "Einkommensteuer",

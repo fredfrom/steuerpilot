@@ -12,6 +12,7 @@ import { typeDefs } from "./schema/typeDefs.js";
 import { resolvers } from "./resolvers/index.js";
 import { connectDB } from "./config/db.js";
 import type { ApolloContext } from "./types/context.types.js";
+import { updateLastChecked } from "./models/AppMeta.js";
 
 import { spawn } from "child_process";
 import path from "path";
@@ -105,6 +106,7 @@ if (cronSchedule !== "disabled") {
   const scriptPath = path.resolve(__dirname, "../../scripts/ingest.ts");
   cron.schedule(cronSchedule, () => {
     console.error(`[cron] RSS ingestion triggered at ${new Date().toISOString()}`);
+    updateLastChecked().catch(() => {});
     // Spawn as child process — scripts/ has its own rootDir and dependencies
     const child = spawn("npx", ["tsx", scriptPath], {
       cwd: path.resolve(__dirname, "../../scripts"),

@@ -3,6 +3,7 @@ import { embedText } from "../services/embedding.js";
 import { searchChunks } from "../services/vectorSearch.js";
 import { generateAnswer } from "../services/llm.js";
 import { BmfChunk } from "../models/BmfChunk.js";
+import { getLastChecked } from "../models/AppMeta.js";
 import { EmbeddingError, VectorSearchError, LlmError } from "../errors/index.js";
 import type {
   SearchResult,
@@ -135,14 +136,8 @@ export const resolvers = {
         { $sort: { count: -1 } },
       ]);
 
-      // Find the most recently dated document
-      const latestDoc = await BmfChunk.findOne()
-        .sort({ "metadata.date": -1 })
-        .select("metadata.date")
-        .lean()
-        .exec();
-
-      const lastUpdated = latestDoc?.metadata?.date ?? new Date().toISOString();
+      const lastChecked = await getLastChecked();
+      const lastUpdated = lastChecked ?? new Date().toISOString();
 
       return { totalDocuments, lastUpdated, byCategory };
     },
