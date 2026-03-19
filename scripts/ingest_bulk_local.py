@@ -57,15 +57,13 @@ EMBED_BATCH_SIZE = 16
 COLLECTION_NAME = "bmf_chunks"
 REQUEST_TIMEOUT = 60
 
-# TLDR generation via Groq (free tier)
-GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.1-8b-instant"
-TLDR_SYSTEM_PROMPT = (
+# TLDR generation via local Ollama
+OLLAMA_URL = "http://localhost:11434/api/generate"
+OLLAMA_MODEL = "llama3"
+TLDR_PROMPT_PREFIX = (
     "Fasse den folgenden Abschnitt aus einem BMF-Schreiben in 1-2 "
-    "prägnanten Sätzen zusammen. Nur die Zusammenfassung, keine Einleitung."
+    "prägnanten Sätzen zusammen. Nur die Zusammenfassung, keine Einleitung.\n\n"
 )
-TLDR_DELAY_SECONDS = 2.1
-TLDR_MAX_RETRIES = 3
 
 
 # ── Data classes ───────────────────────────────────────────────────────────
@@ -388,60 +386,39 @@ def fetch_and_parse_pdf(session: requests.Session, pdf_url: str) -> str:
 # ── TLDR generation ───────────────────────────────────────────────────────
 
 
-def generate_tldr(api_key: str, chunk_text: str) -> str | None:
-    """Generate a 1-2 sentence TLDR via Groq API. Returns None on failure."""
+def generate_tldr(chunk_text: str) -> str | None:
+    """Generate a 1-2 sentence TLDR via local Ollama. Returns None on failure."""
     payload = json.dumps({
-        "model": GROQ_MODEL,
-        "messages": [
-            {"role": "system", "content": TLDR_SYSTEM_PROMPT},
-            {"role": "user", "content": chunk_text[:3000]},
-        ],
-        "max_tokens": 150,
+        "model": OLLAMA_MODEL,
+        "prompt": TLDR_PROMPT_PREFIX + chunk_text[:3000],
+        "stream": False,
+        "options": {"num_predict": 150},
     }).encode("utf-8")
 
     req = Request(
-        GROQ_API_URL,
+        OLLAMA_URL,
         data=payload,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "User-Agent": "Steuerpilot-TLDR/1.0",
-        },
+        headers={"Content-Type": "application/json"},
         method="POST",
     )
 
-    for attempt in range(TLDR_MAX_RETRIES):
-        try:
-            with urlopen(req, timeout=30) as resp:
-                body = json.loads(resp.read().decode("utf-8"))
-                content = body.get("choices", [{}])[0].get("message", {}).get("content")
-                if isinstance(content, str) and content.strip():
-                    return content.strip()
-                return None
-        except HTTPError as e:
-            if e.code == 429:
-                wait = 10 * (attempt + 1)
-                print(f"    TLDR rate limited, waiting {wait}s...", flush=True)
-                time.sleep(wait)
-                continue
+    try:
+        with urlopen(req, timeout=120) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+            content = body.get("response", "")
+            if isinstance(content, str) and content.strip():
+                return content.strip()
             return None
-        except Exception:
-            return None
-    return None
+    except Exception:
+        return None
 
 
-def generate_tldrs_for_chunks(
-    api_key: str | None, chunks: list[str]
-) -> list[str | None]:
-    """Generate TLDRs for a list of chunks. Returns list of TLDRs (None on failure)."""
-    if not api_key:
-        return [None] * len(chunks)
-
+def generate_tldrs_for_chunks(chunks: list[str]) -> list[str | None]:
+    """Generate TLDRs for a list of chunks via local Ollama."""
     tldrs: list[str | None] = []
     for chunk_text in chunks:
-        tldr = generate_tldr(api_key, chunk_text)
+        tldr = generate_tldr(chunk_text)
         tldrs.append(tldr)
-        time.sleep(TLDR_DELAY_SECONDS)
     return tldrs
 
 
@@ -641,9 +618,8 @@ def run_ingestion(dry_run: bool = False, limit: int = sys.maxsize) -> None:
                 "paragraphen": extract_paragraphen(text),
             }
 
-            # Generate TLDRs via Groq (non-critical, failures return None)
-            groq_key = os.environ.get("GROQ_API_KEY")
-            tldrs = generate_tldrs_for_chunks(groq_key, chunks)
+            # Generate TLDRs via local Ollama (non-critical, failures return None)
+            tldrs = generate_tldrs_for_chunks(chunks)
             tldr_count = sum(1 for t in tldrs if t is not None)
             print(f"  Generated {tldr_count}/{len(chunks)} TLDRs")
 
