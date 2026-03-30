@@ -1,0 +1,85 @@
+.banner {
+  background: var(--amber-bg);
+  border-bottom: 1px solid var(--amber-border);
+  padding: 12px 48px;
+}
+
+.inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--amber);
+  flex: 1;
+}
+
+.dismiss {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.dismiss:hover {
+  color: var(--text-muted);
+}
+
+.message {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.progressTrack {
+  height: 3px;
+  background: var(--amber-border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--amber);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
+.timer {
+  font-size: 11px;
+  color: var(--text-light);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@media (max-width: 640px) {
+  .banner {
+    padding: 12px 20px;
+  }
+}

@@ -13,6 +13,7 @@ import { SourceList } from './components/SourceList'
 import { ErrorMessage } from './components/ErrorMessage'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { FaqSection } from './components/FaqSection'
+import { ColdStartBanner } from './components/ColdStartBanner'
 import { Footer } from './components/Footer'
 import styles from './App.module.css'
 
@@ -32,7 +33,9 @@ const SOFTWARE_JSON_LD = JSON.stringify({
 })
 
 export default function App() {
-  const { data: statsData } = useQuery<StatsData>(STATS_QUERY)
+  const { data: statsData, loading: statsLoading, error: statsError } = useQuery<StatsData>(STATS_QUERY, {
+    pollInterval: statsData ? 0 : 5000,
+  })
   const [selectedSteuerart, setSelectedSteuerart] = useState<string>('')
   const [executeSearch, { data, loading, error }] =
     useLazyQuery<SearchData>(SEARCH_QUERY)
@@ -64,6 +67,7 @@ export default function App() {
   return (
     <>
       <Header lastUpdated={lastUpdated} />
+      <ColdStartBanner isConnecting={statsLoading || (!!statsError && !statsData)} />
 
       <div className={styles.hero}>
         <div className={styles.heroInner}>
