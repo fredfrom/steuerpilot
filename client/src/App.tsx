@@ -33,10 +33,16 @@ const SOFTWARE_JSON_LD = JSON.stringify({
 })
 
 export default function App() {
-  const { data: statsData, loading: statsLoading, error: statsError } = useQuery<StatsData>(STATS_QUERY, {
-    pollInterval: statsData ? 0 : 5000,
-  })
+  const { data: statsData, loading: statsLoading, error: statsError, startPolling, stopPolling } = useQuery<StatsData>(STATS_QUERY)
   const [selectedSteuerart, setSelectedSteuerart] = useState<string>('')
+
+  useEffect(() => {
+    if (statsData) {
+      stopPolling()
+    } else {
+      startPolling(5000)
+    }
+  }, [statsData, startPolling, stopPolling])
   const [executeSearch, { data, loading, error }] =
     useLazyQuery<SearchData>(SEARCH_QUERY)
 
