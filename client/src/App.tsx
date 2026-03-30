@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useQuery, useLazyQuery } from '@apollo/client/react'
 import {
   SEARCH_QUERY,
@@ -37,7 +37,6 @@ export default function App() {
     errorPolicy: 'all',
     notifyOnNetworkStatusChange: true,
   })
-  const [selectedSteuerart, setSelectedSteuerart] = useState<string>('')
   const backendReady = !!statsData
 
   useEffect(() => {
@@ -68,13 +67,11 @@ export default function App() {
   }, [])
 
   const handleSearch = (question: string): void => {
-    const steuerart = selectedSteuerart || undefined
-    void executeSearch({ variables: { question, steuerart } })
+    void executeSearch({ variables: { question } })
   }
 
   const totalDocuments = statsData?.stats.totalDocuments
   const lastUpdated = statsData?.stats.lastUpdated
-  const categories = statsData?.stats.byCategory ?? []
 
   return (
     <>
@@ -120,9 +117,6 @@ export default function App() {
           <SearchForm
             onSearch={handleSearch}
             loading={loading}
-            categories={categories}
-            selectedSteuerart={selectedSteuerart}
-            onSteuerartChange={setSelectedSteuerart}
           />
         </div>
       </div>

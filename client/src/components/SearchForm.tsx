@@ -1,21 +1,14 @@
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
-import type { CategoryCount } from '../graphql/queries'
 import styles from './SearchForm.module.css'
 
 interface SearchFormProps {
   onSearch: (question: string) => void
   loading: boolean
-  categories: CategoryCount[]
-  selectedSteuerart: string
-  onSteuerartChange: (steuerart: string) => void
 }
 
 export function SearchForm({
   onSearch,
   loading,
-  categories,
-  selectedSteuerart,
-  onSteuerartChange,
 }: SearchFormProps) {
   const [question, setQuestion] = useState('')
 
@@ -51,23 +44,6 @@ export function SearchForm({
           rows={2}
         />
         <div className={styles.bottom}>
-          <div className={styles.pills}>
-            {categories.slice(0, 5).map((cat) => (
-              <button
-                key={cat.steuerart}
-                type="button"
-                className={`${styles.pill} ${selectedSteuerart === cat.steuerart ? styles.pillActive : ''}`}
-                aria-pressed={selectedSteuerart === cat.steuerart}
-                onClick={() =>
-                  onSteuerartChange(
-                    selectedSteuerart === cat.steuerart ? '' : cat.steuerart
-                  )
-                }
-              >
-                {cat.steuerart}
-              </button>
-            ))}
-          </div>
           <button
             className={styles.searchBtn}
             type="submit"

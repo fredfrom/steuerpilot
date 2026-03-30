@@ -45,37 +45,6 @@
   gap: 12px;
 }
 
-.pills {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  overflow: hidden;
-}
-
-.pill {
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border-dark);
-  background: var(--white);
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: 'DM Sans', sans-serif;
-  white-space: nowrap;
-}
-
-.pill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.pillActive {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
 .searchBtn {
   background: var(--accent);
   color: #fff;
