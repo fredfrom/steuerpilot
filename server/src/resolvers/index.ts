@@ -70,7 +70,7 @@ export const resolvers = {
         if (uniqueChunks.length === 0) {
           return {
             answer:
-              "Zu dieser Suchanfrage wurden keine passenden BMF-Schreiben gefunden. Versuchen Sie, Ihre Frage als vollständigen Satz zu formulieren — z.\u00A0B. „Welche Regelungen gelten für den Vorsteuerabzug?" statt nur „Vorsteuerabzug".",
+              "Zu dieser Suchanfrage wurden keine passenden BMF-Schreiben gefunden. Versuchen Sie, Ihre Frage als vollst\u00E4ndigen Satz zu formulieren, z.B. \"Welche Regelungen gelten f\u00FCr den Vorsteuerabzug?\" statt nur \"Vorsteuerabzug\".",
             sources: [],
           };
         }
