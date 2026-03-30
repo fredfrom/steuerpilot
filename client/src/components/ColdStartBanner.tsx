@@ -1,8 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import styles from './ColdStartBanner.module.css'
 
 const COLD_START_THRESHOLD_MS = 3000
 const EXPECTED_COLD_START_MS = 50000
+const SESSION_KEY = 'steuerpilot_cold_start'
+
+function getStartTime(): number {
+  const stored = sessionStorage.getItem(SESSION_KEY)
+  if (stored) return Number(stored)
+  const now = Date.now()
+  sessionStorage.setItem(SESSION_KEY, String(now))
+  return now
+}
 
 interface ColdStartBannerProps {
   isConnecting: boolean
@@ -12,24 +21,33 @@ export function ColdStartBanner({ isConnecting }: ColdStartBannerProps) {
   const [showBanner, setShowBanner] = useState(false)
   const [elapsedMs, setElapsedMs] = useState(0)
   const [dismissed, setDismissed] = useState(false)
+  const startTimeRef = useRef<number>(0)
 
   useEffect(() => {
     if (!isConnecting) {
       setShowBanner(false)
-      setElapsedMs(0)
+      sessionStorage.removeItem(SESSION_KEY)
       return
     }
 
-    const thresholdTimer = setTimeout(() => {
+    startTimeRef.current = getStartTime()
+    const elapsed = Date.now() - startTimeRef.current
+
+    if (elapsed >= COLD_START_THRESHOLD_MS) {
       setShowBanner(true)
-    }, COLD_START_THRESHOLD_MS)
+    }
+    setElapsedMs(elapsed)
+
+    const thresholdTimer = elapsed < COLD_START_THRESHOLD_MS
+      ? setTimeout(() => setShowBanner(true), COLD_START_THRESHOLD_MS - elapsed)
+      : undefined
 
     const intervalId = setInterval(() => {
-      setElapsedMs((prev) => prev + 1000)
+      setElapsedMs(Date.now() - startTimeRef.current)
     }, 1000)
 
     return () => {
-      clearTimeout(thresholdTimer)
+      if (thresholdTimer) clearTimeout(thresholdTimer)
       clearInterval(intervalId)
     }
   }, [isConnecting])

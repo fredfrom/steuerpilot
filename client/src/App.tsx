@@ -33,16 +33,22 @@ const SOFTWARE_JSON_LD = JSON.stringify({
 })
 
 export default function App() {
-  const { data: statsData, loading: statsLoading, error: statsError, startPolling, stopPolling } = useQuery<StatsData>(STATS_QUERY)
+  const { data: statsData, refetch } = useQuery<StatsData>(STATS_QUERY, {
+    errorPolicy: 'all',
+    notifyOnNetworkStatusChange: true,
+  })
   const [selectedSteuerart, setSelectedSteuerart] = useState<string>('')
+  const backendReady = !!statsData
 
   useEffect(() => {
-    if (statsData) {
-      stopPolling()
-    } else {
-      startPolling(5000)
-    }
-  }, [statsData, startPolling, stopPolling])
+    if (backendReady) return
+
+    const timerId = setInterval(() => {
+      void refetch().catch(() => { /* retry on next interval */ })
+    }, 5000)
+
+    return () => clearInterval(timerId)
+  }, [backendReady, refetch])
   const [executeSearch, { data, loading, error }] =
     useLazyQuery<SearchData>(SEARCH_QUERY)
 
@@ -73,7 +79,7 @@ export default function App() {
   return (
     <>
       <Header lastUpdated={lastUpdated} />
-      <ColdStartBanner isConnecting={statsLoading || (!!statsError && !statsData)} />
+      <ColdStartBanner isConnecting={!backendReady} />
 
       <div className={styles.hero}>
         <div className={styles.heroInner}>
