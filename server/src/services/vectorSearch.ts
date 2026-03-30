@@ -13,7 +13,7 @@ import type {
 // To calibrate: check Render logs for score values on 5-10 known good queries
 // and 5-10 out-of-scope queries. Set threshold just above the out-of-scope ceiling.
 // Typical target range: 0.72–0.82 depending on corpus and embedding model.
-const SIMILARITY_THRESHOLD = 0.75;
+const SIMILARITY_THRESHOLD = 0.55;
 
 /**
  * Perform a MongoDB Atlas vector search on the bmf_chunks collection.
@@ -58,6 +58,12 @@ export async function searchChunks(
 
   try {
     const results = await BmfChunk.aggregate<VectorSearchResult>(pipeline);
+    if (results.length > 0) {
+      const scores = results.map((r) => r.score.toFixed(4));
+      console.error(`[vectorSearch] scores: [${scores.join(', ')}], threshold: ${SIMILARITY_THRESHOLD}`);
+    } else {
+      console.error('[vectorSearch] $vectorSearch returned 0 results (pre-threshold)');
+    }
     return results.filter((r) => r.score >= SIMILARITY_THRESHOLD);
   } catch (error: unknown) {
     throw new VectorSearchError("Vector search aggregation failed", error);

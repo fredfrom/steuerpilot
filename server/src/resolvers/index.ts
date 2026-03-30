@@ -67,6 +67,14 @@ export const resolvers = {
         const chunks = await searchChunks(queryEmbedding, { steuerart });
         const uniqueChunks = deduplicateBySource(chunks);
 
+        if (uniqueChunks.length === 0) {
+          return {
+            answer:
+              "Zu dieser Suchanfrage wurden keine passenden BMF-Schreiben gefunden. Versuchen Sie, Ihre Frage als vollständigen Satz zu formulieren — z.\u00A0B. „Welche Regelungen gelten für den Vorsteuerabzug?" statt nur „Vorsteuerabzug".",
+            sources: [],
+          };
+        }
+
         const llmChunks: LlmContextChunk[] = uniqueChunks.map((chunk) => ({
           text: chunk.text,
           metadata: {
